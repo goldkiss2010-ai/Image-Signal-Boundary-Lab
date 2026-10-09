@@ -22,15 +22,21 @@ Use **LAB / 全体表示** for photographs and image-derived statistics. Use **C
 
 ### CUBE: uniform starting volume
 
-The starting object contains **13,824 synthetic points**: a deterministic, stratified sample with exactly one point in each of **24 × 24 × 24** equal RGB subcells. Each displayed particle has the same size and nominal opacity. The initial spatial distribution covers the entire [0, 1]³ RGB cube rather than reflecting the histogram of any photograph.
+The Cube workspace is a **conceptual model, independent of any uploaded image**. It starts with **13,824 interior particles**, sampled with one deterministic point per cell in a 24 × 24 × 24 subdivision of the unit RGB cube. Another **3,456 explicit surface particles** lie on the six faces (24 × 24 per face); they can be highlighted independently.
 
-Change **exposure**, **saturation**, or **signal Log curve** to transform the synthetic point cloud. You can optionally **clip to [0, 1]** to observe the collapse of out-of-range points onto the boundary. The overflow percentage is calculated before this optional clipping. The original uniform cube and point positions remain faintly visible as a reference when a transform is active; the 12 transformed cube edges are drawn to make the shape change explicit.
+The same core adjustment types as LAB are supported, but with **independent state**: an editable per-channel **tone curve**, **exposure (EV)** and **saturation**. There is also an optional **signal Log** transform and an optional final **[0, 1] clip**. Processing order:
 
-Choose a **Linear**, **sRGB**, or **normalized Log display coordinate system** independently of the signal operations. Display-coordinate changes change the visualization only, not the synthetic signal data. Beyond [0, 1], coordinate maps use endpoint tangent extrapolation.
+`Tone curve → signal Log → exposure → saturation → optional clip`
 
-Render as **particles (Cube default)**, **density**, or **Log density**. Log density refers to logarithmic opacity mapping of screen-space particle counts, and is distinct from either signal Log or display Log.
+When clipping is enabled, surface particles representing pre-clipped out-of-range signal values receive an orange halo. The displayed overflow fraction is measured **before clipping** and is calculated over the uniform interior samples. The original uniform volume stays faintly visible when a transformation is active; the twelve edges of the transformed cube are also traced.
 
-The photo-based LAB workspace retains its own image input, transform controls, full numerical analysis, and vectorscope. Switching between the two workspaces does not replace the image data with the synthetic cube or vice versa.
+**Camera framing** is automatically adjusted to keep the original cube, transformed interior particles and transformed surface particles visible. The Cube starts from a more distant view than the LAB cube. A relative zoom slider (45–180%) can override this fitted camera scale, and “視点を戻す” restores default camera orientation and zoom.
+
+The coordinate view can independently be **Linear**, **sRGB**, or **normalized Log** (with adjustable strength). Coordinate changes affect only visualization, not the stored RGB values. For out-of-range signal values, coordinate transforms continue by endpoint tangent extrapolation.
+
+Display methods: **particles (Cube default)**, **density**, and **Log density**. The Log-density renderer changes screen-space accumulation, not the signal or 3D coordinates. Particle size/opacity are uniform within each rendering group; the concept begins with a spatially uniform 3D sampling density.
+
+The photo-based LAB workspace retains its own input, transforms, numerical analysis and vectorscope. Changes in the conceptual Cube never modify the loaded image.
 
 ## Try it
 
