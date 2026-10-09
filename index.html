@@ -406,6 +406,12 @@ function drawLogDensity(ctx,W,H){
 function selectWorkspace(focus){
  focusMode=focus;
  root.classList.toggle('cube-only',focus);
+ // Put the interactive cube immediately beneath the mode switch in CUBE.
+ // Restore the original LAB document order when switching back.
+ const grid=root.querySelector('.main-grid');
+ const tools=root.querySelector('.cube-tools');
+ if(focus)root.insertBefore(grid,tools);
+ else root.insertBefore(tools,grid);
  $('lab-tab').classList.toggle('active',!focus);$('cube-tab').classList.toggle('active',focus);
  $('lab-tab').setAttribute('aria-pressed',String(!focus));
  $('cube-tab').setAttribute('aria-pressed',String(focus));
