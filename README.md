@@ -1,8 +1,10 @@
-# Image Signal Boundary Lab
+# 色のかたち / Shape of Color
 
-**Color Field** — an experimental, browser-based visualizer for image signals and the boundaries of an RGB cube.
+RGB信号の分布と変形を、三次元空間で観察するブラウザー用ビジュアライザーです。
 
-Load a photograph, adjust exposure, saturation, or the tone curve, and watch the distribution of its RGB values move through—and sometimes outside—the unit cube. Touching a boundary is not, by itself, an error. The aim is to **observe** image transformations rather than automatically judge image quality.
+**画像**モードでは写真からRGB分布をつくり、露出・彩度・トーンカーブによる変化を観察します。**CUBE**モードでは写真に依存しない均一なRGB立方体を使い、信号変換そのものを可視化します。
+
+**Shape of Color** is an experimental, browser-based visualizer for RGB signal distributions and their transformations. Its **画像 (Image)** mode uses real photographs; its **CUBE** mode starts from a synthetic, uniformly sampled RGB cube. The goal is observation, not automatic judgment of image quality. Contact with a boundary is not by itself an error.
 
 *Work in progress. Built for exploration and education.*
 
@@ -18,7 +20,7 @@ Load a photograph, adjust exposure, saturation, or the tone curve, and watch the
 
 ## View modes
 
-Use **LAB / 全体表示** for photographs and image-derived statistics. Use **CUBE / 均一RGB立方体** for a **separate conceptual visualization**. Cube mode does **not** use the uploaded image as its input.
+Use **画像 / 入力画像の分布** for photographs and image-derived statistics. Use **CUBE / 均一RGB立方体** for a **separate conceptual visualization**. Cube mode does **not** use the uploaded image as its input.
 
 ### CUBE: uniform starting volume
 
@@ -30,11 +32,11 @@ The concept view offers independent exposure, saturation and an editable RGB ton
 
 The original cube and point distribution remain faintly visible after a transform (ghost overlay). The twelve transformed edges are drawn to make the change of shape visible. **There is no extra surface-particle layer or surface highlighting.** The out-of-range percentage describes the interior samples *before* optional clipping.
 
-The camera automatically fits the full transformed object, including the exact transformed corners; zoom (45–180% of the fitted framing) remains adjustable. On phones, the cube follows scrolling as a floating mini-view while editing the concept curve, independently of the image-based LAB mode. The mini-view can be rotated, minimized, or moved to the other side of the screen.
+The camera automatically fits the full transformed object, including the exact transformed corners; zoom (45–180% of the fitted framing) remains adjustable. On phones, the cube follows scrolling as a floating mini-view while editing the concept curve, independently of the image-based 画像 mode. The mini-view can be rotated, minimized, or moved to the other side of the screen.
 
 The view-coordinate mapping (Linear, sRGB or normalized Log) is independent of the signal transforms, and never changes the stored synthetic values. Display modes are particles (default in CUBE), density and Log density. Coordinate Log, signal Log, and density Log are three distinct operations.
 
-The photo-based LAB workspace retains its own image input, transforms, numerical analysis, vectorscope and normal small floating cube. CUBE edits do not change LAB image data.
+The photo-based 画像 workspace retains its own image input, transforms, numerical analysis, vectorscope and normal small floating cube. CUBE edits do not change 画像 input data.
 
 ## Try it
 
@@ -69,7 +71,7 @@ When using third-party photographs with this tool, rights to those photographs r
 
 ## 日本語
 
-**Color Field** は、RGBキューブ内外の信号分布を観察する実験的なブラウザー用ツールです。露出・彩度・トーンカーブを変更すると、信号の分布と数値解析が更新されます。境界への接触そのものを異常とはみなしません。
+**色のかたち / Shape of Color** は、RGBキューブ内外の信号分布を観察する実験的なブラウザー用ツールです。露出・彩度・トーンカーブを変更すると、信号の分布と数値解析が更新されます。境界への接触そのものを異常とはみなしません。
 
 画像の処理はブラウザー内で行われます。現状は簡易モデルで、元画像を縮小して解析するため、精密な色管理・品質判定には使用しないでください。
 
