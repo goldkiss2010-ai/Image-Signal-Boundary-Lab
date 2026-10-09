@@ -18,13 +18,19 @@ Load a photograph, adjust exposure, saturation, or the tone curve, and watch the
 
 ## View modes
 
-Use the **LAB / 全体表示** and **CUBE / Cube専用** buttons to switch between the original analysis workspace and a larger, focused RGB cube.
+Use **LAB / 全体表示** for photographs and image-derived statistics. Use **CUBE / 均一RGB立方体** for a **separate conceptual visualization**. Cube mode does **not** use the uploaded image as its input.
 
-In Cube mode you can compare **Linear RGB**, **sRGB coordinate mapping**, and **normalized logarithmic coordinates**, with an adjustable Log parameter. Coordinate changes affect the visualization, not the stored signal or boundary statistics. For out-of-range signals the coordinate functions are extended from the endpoints by their tangents.
+### CUBE: uniform starting volume
 
-Rendering modes are **uniform particles (default)**, **density**, and **Log density**. Uniform particles give sampled pixels equally sized and equally opaque marks; **they do not force the signal's actual distribution to be spatially uniform in RGB space**. Log density compresses counts per screen-space bin to reveal both sparse and crowded regions.
+The starting object contains **13,824 synthetic points**: a deterministic, stratified sample with exactly one point in each of **24 × 24 × 24** equal RGB subcells. Each displayed particle has the same size and nominal opacity. The initial spatial distribution covers the entire [0, 1]³ RGB cube rather than reflecting the histogram of any photograph.
 
-Turn on **ghost / 元の点群を薄く重ねる** to show the unadjusted image samples faintly behind the transformed samples. The comparison overlay is shown when exposure, saturation, or the curve has changed. The original Lab screen and its detailed numerical analysis remain available.
+Change **exposure**, **saturation**, or **signal Log curve** to transform the synthetic point cloud. You can optionally **clip to [0, 1]** to observe the collapse of out-of-range points onto the boundary. The overflow percentage is calculated before this optional clipping. The original uniform cube and point positions remain faintly visible as a reference when a transform is active; the 12 transformed cube edges are drawn to make the shape change explicit.
+
+Choose a **Linear**, **sRGB**, or **normalized Log display coordinate system** independently of the signal operations. Display-coordinate changes change the visualization only, not the synthetic signal data. Beyond [0, 1], coordinate maps use endpoint tangent extrapolation.
+
+Render as **particles (Cube default)**, **density**, or **Log density**. Log density refers to logarithmic opacity mapping of screen-space particle counts, and is distinct from either signal Log or display Log.
+
+The photo-based LAB workspace retains its own image input, transform controls, full numerical analysis, and vectorscope. Switching between the two workspaces does not replace the image data with the synthetic cube or vice versa.
 
 ## Try it
 
