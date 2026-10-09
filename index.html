@@ -1,0 +1,178 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Color Field — Signal Studio</title></head><body style="margin:0;background:#edece6">
+<div id="cfv3" class="cf-app">
+<style>
+#cfv3{--paper:#f6f5ef;--ink:#18252b;--secondary:#65747a;--line:#d7dcd9;--accent:#dd624b;--blue:#3367b5;--black:#101b28;background:var(--paper);color:var(--ink);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",system-ui,sans-serif;font-size:13px;line-height:1.5;padding:16px;max-width:1050px;margin:0 auto}
+#cfv3 *{box-sizing:border-box}#cfv3 button,#cfv3 input{font:inherit}#cfv3 button{cursor:pointer}#cfv3 .eyebrow{color:var(--accent);font-size:10px;letter-spacing:.19em;font-weight:750}#cfv3 .mast{display:flex;align-items:end;justify-content:space-between;gap:12px;padding:5px 0 19px;border-bottom:1px solid var(--ink)}#cfv3 h2{font-size:clamp(31px,7vw,49px);font-weight:550;line-height:1.02;letter-spacing:-.065em;margin:6px 0 0}#cfv3 .mastsmall{font-size:10px;color:var(--secondary);text-align:right;letter-spacing:.07em;line-height:1.7}
+#cfv3 .sectionline{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin:16px 0 8px}#cfv3 .sectionline strong{font-size:12px;letter-spacing:.06em;font-weight:750}#cfv3 .tiny{font-size:10px;color:var(--secondary)}#cfv3 .field{border:1px solid var(--line);background:#fffdf8;padding:11px;border-radius:3px}
+#cfv3 .stage{background:#101d2a;border-radius:3px;overflow:hidden;position:relative}#cfv3 .stagehead{padding:12px 14px 0;display:flex;align-items:center;justify-content:space-between;gap:8px;color:#b3c4cf}#cfv3 .stagelabel{font-size:11px;letter-spacing:.13em;color:#9bafbd;font-weight:650}#cfv3 .toggle{display:flex;align-items:center;gap:2px;border:1px solid #526574;border-radius:5px;padding:2px}#cfv3 .toggle button{background:transparent;border:0;color:#8ea7b8;font-size:11px;padding:5px 9px;border-radius:3px}#cfv3 .toggle button.sel{background:#d9eaf2;color:#14212e}#cfv3 #cfv3-cube{display:block;width:100%;height:auto;touch-action:none;cursor:grab}#cfv3 .stagefoot{display:flex;justify-content:space-between;align-items:center;padding:0 14px 12px;color:#a1b3c1;font-size:10px}#cfv3 .resetview{border:1px solid #556c7d;background:transparent;color:#d2dfe7;border-radius:3px;padding:4px 8px;font-size:10px}
+#cfv3 .metricgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}#cfv3 .metric{padding:13px 12px 12px;border:1px solid var(--line);background:#fffdf9;min-width:0}#cfv3 .metric.primary{background:var(--ink);color:#f6f6f0;border-color:var(--ink)}#cfv3 .metric .mlabel{font-size:10px;color:var(--secondary);min-height:15px}#cfv3 .metric.primary .mlabel{color:#b1bdc2}#cfv3 .metric .mvalue{font-size:clamp(22px,7vw,30px);line-height:1.4;letter-spacing:-.05em;font-weight:560;font-variant-numeric:tabular-nums}#cfv3 .metric.primary .mvalue{color:#ffe7d3}#cfv3 .metric .units{color:var(--secondary);font-size:10px;letter-spacing:.02em}#cfv3 .metric.primary .units{color:#b1bdc2}
+#cfv3 .channels{margin-top:8px;border:1px solid var(--line);background:#fffdf9;padding:11px}#cfv3 .channelshead{display:flex;justify-content:space-between;margin-bottom:8px;color:var(--secondary);font-size:10px}#cfv3 .chrow{display:grid;grid-template-columns:16px 1fr 66px;align-items:center;gap:10px;font-size:11px;margin-top:7px}#cfv3 .chbar{height:7px;background:#edf0ed;overflow:hidden;display:flex}#cfv3 .chbar span{display:block;height:100%}#cfv3 .chrow b{font-size:12px}#cfv3 .right{text-align:right;font-variant-numeric:tabular-nums}
+#cfv3 .visgrid{display:grid;grid-template-columns:1fr;gap:12px}#cfv3 .scope{background:#13222f;border-radius:3px;position:relative}#cfv3 #cfv3-scope{display:block;width:100%;height:auto}#cfv3 .scopefooter{font-size:10px;color:#66777d;margin-top:6px}#cfv3 .photogrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}#cfv3 .photoframe{border:1px solid var(--line);background:#fffdf9;overflow:hidden}#cfv3 .photoframe span{display:block;color:#586b75;padding:6px 8px;font-size:10px;letter-spacing:.12em;font-weight:700}#cfv3 .photoframe canvas{width:100%;display:block;height:auto;background:#eff0ed}
+#cfv3 .swatch{height:31px;width:100%;display:flex;gap:3px;overflow:hidden;background:#e7e9e6}#cfv3 .swatch i{display:block;min-width:2px;flex-basis:0;height:100%}#cfv3 .controlbox{background:#fffdf9;border:1px solid var(--line);padding:13px}#cfv3 .controlhead{display:flex;align-items:center;justify-content:space-between;gap:12px}#cfv3 .btn{border:1px solid var(--ink);background:var(--ink);color:white;border-radius:3px;padding:9px 13px;font-weight:600;font-size:11px}#cfv3 .btn.soft{background:transparent;color:var(--ink);border-color:#aab5b5}#cfv3 .btn:active{transform:translateY(1px)}#cfv3 .ctrlrow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:13px 0}#cfv3 .ctrlrow label{display:flex;justify-content:space-between;gap:7px;font-size:12px}#cfv3 .ctrlrow output{font-variant-numeric:tabular-nums;font-weight:700;color:var(--accent)}#cfv3 input[type=range]{width:100%;height:24px;accent-color:var(--accent);margin:6px 0 0;cursor:pointer}#cfv3 #cfv3-curve{display:block;width:100%;height:auto;touch-action:none;background:#faf9f4;border:1px solid var(--line)}#cfv3 .curveactions{display:flex;gap:7px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:10px}#cfv3 .curveactions .btn{padding:7px 9px;font-size:10px}#cfv3 .fineprint{font-size:10px;color:#6f7e80;line-height:1.65;margin:13px 0 0;padding-bottom:7px}#cfv3 .mobilebreak{display:block}
+@media(min-width:700px){#cfv3{padding:25px}#cfv3 .main-grid{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(0,.82fr);gap:14px;align-items:start}#cfv3 .metricgrid{grid-template-columns:repeat(2,1fr)}#cfv3 .visgrid{grid-template-columns:1fr 1fr}#cfv3 .controlsgrid{display:grid;grid-template-columns:1fr 1fr;gap:15px}#cfv3 .mobilebreak{display:none}#cfv3 .sectionline{margin-top:22px}}
+</style>
+<header class="mast"><div><div class="eyebrow">IMAGE SIGNAL / INTERACTIVE STUDY</div><h2>Color Field<span style="color:#df664f">.</span></h2></div><div class="mastsmall">RGB VISUALIZER<br>STUDY / 03</div></header>
+<div class="main-grid">
+<div><div class="sectionline"><strong>01 / COLOR SPACE</strong><span class="tiny">linear RGB · floating point</span></div><div class="stage"><div class="stagehead"><span class="stagelabel">RGB DISTRIBUTION</span><div class="toggle"><button id="cfv3-density" class="sel">密度</button><button id="cfv3-particles">粒子</button></div></div><canvas id="cfv3-cube" width="760" height="635"></canvas><div class="stagefoot"><span>ドラッグして回転 · 領域外も表示</span><button class="resetview" id="cfv3-view">視点を戻す</button></div></div></div>
+<div><div class="sectionline"><strong>02 / SIGNAL ANALYSIS</strong><span class="tiny">LIVE / ALL PIXELS</span></div><div class="metricgrid">
+<div class="metric primary"><div class="mlabel">RGB領域外の画素</div><div class="mvalue" id="cfv3-outpct">0.00%</div><div class="units">いずれかの成分が 0–1 の外</div></div>
+<div class="metric"><div class="mlabel">上限超過</div><div class="mvalue" id="cfv3-highpct">0.00%</div><div class="units">いずれかが 1 より大</div></div>
+<div class="metric"><div class="mlabel">下限超過</div><div class="mvalue" id="cfv3-lowpct">0.00%</div><div class="units">いずれかが 0 未満</div></div>
+<div class="metric"><div class="mlabel">境界接触</div><div class="mvalue" id="cfv3-contact">0.00%</div><div class="units">数値的に 0 または 1</div></div>
+<div class="metric"><div class="mlabel">最大超過量</div><div class="mvalue" id="cfv3-max">0.000</div><div class="units">1.0 を基準とする値</div></div>
+<div class="metric"><div class="mlabel">解析画素</div><div class="mvalue" id="cfv3-count">—</div><div class="units">縮小画像に対する全数</div></div>
+</div><div class="channels"><div class="channelshead"><span>チャンネル別超過</span><span>上限 <span style="color:#d75e4c">■</span> / 下限 <span style="color:#4787ae">■</span></span></div><div id="cfv3-channels"></div></div></div>
+</div>
+<div class="visgrid">
+<div><div class="sectionline"><strong>03 / VECTORSCOPE</strong><span class="tiny">CHROMA DISTRIBUTION</span></div><div class="field"><div class="scope"><canvas id="cfv3-scope" width="510" height="410"></canvas></div><div class="scopefooter">表示用sRGBの色差分布 · RGBキューブとは異なる2次元投影</div></div></div>
+<div><div class="sectionline"><strong>04 / IMAGE</strong><span class="tiny" id="cfv3-filename">デモ画像</span></div><div class="photogrid"><div class="photoframe"><span>SOURCE</span><canvas id="cfv3-before" width="400" height="260"></canvas></div><div class="photoframe"><span>RESULT</span><canvas id="cfv3-after" width="400" height="260"></canvas></div></div><div class="sectionline"><strong>COLOR MASS</strong><span class="tiny">出現頻度順 · 表示色</span></div><div class="swatch" id="cfv3-palette"></div></div>
+</div>
+<div class="controlsgrid">
+<div><div class="sectionline"><strong>05 / TRANSFORM</strong><span class="tiny">NON-DESTRUCTIVE</span></div><div class="controlbox"><div class="controlhead"><strong style="font-size:12px">入力と調整</strong><div style="display:flex;gap:6px"><button id="cfv3-demo" class="btn soft">デモ</button><label for="cfv3-file" class="btn" style="cursor:pointer">＋ 写真を選ぶ</label><input id="cfv3-file" type="file" accept="image/jpeg,image/png,image/webp,image/avif" style="display:none"></div></div><div class="ctrlrow"><div><label for="cfv3-ev">露出 <output id="cfv3-evval">+0.00 EV</output></label><input id="cfv3-ev" type="range" min="-3" max="4" value="0" step="0.05"></div><div><label for="cfv3-sat">彩度 <output id="cfv3-satval">100%</output></label><input id="cfv3-sat" type="range" min="0" max="250" value="100" step="5"></div></div><button id="cfv3-reset" class="btn soft" style="width:100%">↺ 原画像にリセット</button></div></div>
+<div><div class="sectionline"><strong>06 / TONE CURVE</strong><span class="tiny">DRAG / ADD POINT</span></div><div class="controlbox"><canvas id="cfv3-curve" width="460" height="330"></canvas><div class="curveactions"><span class="tiny">線をタップして点を追加 · ドラッグで変更</span><button id="cfv3-remove" class="btn soft">選択点を削除</button><button id="cfv3-straight" class="btn soft">直線に戻す</button></div></div></div>
+</div>
+<p class="fineprint">演算：JPEGなどをsRGBから線形RGBに復号 → トーンカーブ（各チャンネル）→ 露出（RGB共通倍率）→ 彩度（相対輝度基準）。領域外の信号は内部で保持し、画像プレビューと色差スコープのみ表示用にクリップします。境界への接触は異常を意味しません。写真は端末内で処理します。独立した教育・可視化用プロトタイプです。</p>
+<script>
+(function(){
+const root=document.getElementById('cfv3');if(!root||root.dataset.init)return;root.dataset.init='1';
+const $=s=>root.querySelector('#cfv3-'+s),clip=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)),fmt=x=>(x*100).toFixed(2)+'%';
+const dec=Float32Array.from({length:256},(_,i)=>{let x=i/255;return x<=.04045?x/12.92:Math.pow((x+.055)/1.055,2.4)});
+const enc=x=>{x=clip(x);return x<=.0031308?12.92*x:1.055*Math.pow(x,1/2.4)-.055};
+let width=0,height=0,signal=null,cloud=[],scopePoints=[],mode='density',yaw=.8,pitch=.52,scheduleFlag=false,highOut=false;
+let curveNodes=[],selected=-1,dragCurve=false,curveLut=new Float32Array(2049),curveHist=new Uint32Array(64);
+const cube=$('cube'),scope=$('scope'),curve=$('curve'),ev=$('ev'),sat=$('sat');
+function buildCurve(){
+ const pts=[[0,0],...curveNodes,[1,1]],n=pts.length,dx=[],s=[],m=[];
+ for(let i=0;i<n-1;i++){dx[i]=pts[i+1][0]-pts[i][0];s[i]=(pts[i+1][1]-pts[i][1])/dx[i]}
+ m[0]=s[0];m[n-1]=s[n-2];
+ for(let i=1;i<n-1;i++){
+  if(s[i-1]*s[i]<=0)m[i]=0;
+  else{let a=2*dx[i]+dx[i-1],b=dx[i]+2*dx[i-1];m[i]=(a+b)/(a/s[i-1]+b/s[i])}
+ }
+ let j=0;
+ for(let i=0;i<curveLut.length;i++){
+  let x=i/2048;while(j<n-2&&x>pts[j+1][0])j++;
+  let t=clip((x-pts[j][0])/dx[j]),t2=t*t,t3=t2*t;
+  curveLut[i]=(2*t3-3*t2+1)*pts[j][1]+(t3-2*t2+t)*dx[j]*m[j]+(-2*t3+3*t2)*pts[j+1][1]+(t3-t2)*dx[j]*m[j+1];
+ }
+ drawCurve();
+}
+function cv(x){const t=clip(x)*2048,i=Math.min(2047,Math.floor(t)),f=t-i;return curveLut[i]*(1-f)+curveLut[i+1]*f}
+function apply(r,g,b,k,s){r=cv(r);g=cv(g);b=cv(b);const Y=.2126*r+.7152*g+.0722*b;return [k*(Y+s*(r-Y)),k*(Y+s*(g-Y)),k*(Y+s*(b-Y))]}
+function drawCurve(){
+ let ctx=curve.getContext('2d'),W=460,H=330,L=39,T=17,S=274;
+ ctx.fillStyle='#fcfbf6';ctx.fillRect(0,0,W,H);
+ const max=Math.max(1,...curveHist);
+ for(let i=0;i<64;i++){let v=curveHist[i]/max;ctx.fillStyle='rgba(51,103,181,.14)';ctx.fillRect(L+i*S/64,T+S*(1-v),S/64+.3,S*v)}
+ ctx.strokeStyle='#d1dad9';ctx.lineWidth=1;
+ for(let i=0;i<=4;i++){let t=i*S/4;ctx.beginPath();ctx.moveTo(L+t,T);ctx.lineTo(L+t,T+S);ctx.moveTo(L,T+t);ctx.lineTo(L+S,T+t);ctx.stroke()}
+ ctx.strokeStyle='#aaaeb2';ctx.setLineDash([4,5]);ctx.beginPath();ctx.moveTo(L,T+S);ctx.lineTo(L+S,T);ctx.stroke();ctx.setLineDash([]);
+ ctx.beginPath();for(let i=0;i<curveLut.length;i+=4){let x=i/2048,y=curveLut[i];if(i===0)ctx.moveTo(L+x*S,T+(1-y)*S);else ctx.lineTo(L+x*S,T+(1-y)*S)}
+ ctx.strokeStyle='#d95f4b';ctx.lineWidth=3.25;ctx.stroke();
+ curveNodes.forEach((n,i)=>{ctx.beginPath();ctx.arc(L+n[0]*S,T+(1-n[1])*S,i===selected?7:5.5,0,7);ctx.fillStyle='#fffdf9';ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle='#d95f4b';ctx.stroke()});
+ ctx.fillStyle='#5a6a73';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('INPUT / 0–1',L+S/2,H-10);ctx.save();ctx.translate(15,T+S/2);ctx.rotate(-Math.PI/2);ctx.fillText('OUTPUT',0,0);ctx.restore();
+ ctx.fillStyle='#84918f';ctx.font='10px system-ui';ctx.fillText('0',L,T+S+14);ctx.fillText('1',L+S,T+S+14);
+}
+function curvePos(e){const r=curve.getBoundingClientRect(),x=(e.clientX-r.left)*460/r.width,y=(e.clientY-r.top)*330/r.height;return {x:clip((x-39)/274),y:clip(1-(y-17)/274),sx:x,sy:y}}
+curve.addEventListener('pointerdown',e=>{
+ const p=curvePos(e);if(p.sx<22||p.sx>334||p.sy<0||p.sy>312)return;
+ let idx=-1,dist=999;curveNodes.forEach((q,i)=>{let d=Math.hypot((q[0]-p.x)*274,(q[1]-p.y)*274);if(d<dist){idx=i;dist=d}});
+ if(dist>21){if(curveNodes.length>=10||p.x<=.005||p.x>=.995)return;curveNodes.push([p.x,p.y]);curveNodes.sort((a,b)=>a[0]-b[0]);idx=curveNodes.findIndex(q=>q[0]===p.x&&q[1]===p.y)}
+ selected=idx;dragCurve=true;curve.setPointerCapture(e.pointerId);buildCurve();request();
+});
+curve.addEventListener('pointermove',e=>{
+ if(!dragCurve||selected<0)return;const p=curvePos(e);let a=selected>0?curveNodes[selected-1][0]+.012:.012,b=selected<curveNodes.length-1?curveNodes[selected+1][0]-.012:.988;
+ curveNodes[selected]=[clip(p.x,a,b),p.y];buildCurve();request();
+});
+curve.addEventListener('pointerup',()=>dragCurve=false);curve.addEventListener('pointercancel',()=>dragCurve=false);
+$('remove').onclick=()=>{if(selected<0)return;curveNodes.splice(selected,1);selected=-1;buildCurve();request()};
+$('straight').onclick=()=>{curveNodes=[];selected=-1;buildCurve();request()};
+function reset(){ev.value=0;sat.value=100;curveNodes=[];selected=-1;buildCurve();request()};$('reset').onclick=reset;
+function fromCanvas(canvas,name){
+ width=canvas.width;height=canvas.height;
+ const data=canvas.getContext('2d',{willReadFrequently:true}).getImageData(0,0,width,height);
+ const pixel=data.data,n=width*height;signal=new Float32Array(n*3);curveHist.fill(0);
+ for(let p=0;p<n;p++){let j=p*3,i=p*4;let r=dec[pixel[i]],g=dec[pixel[i+1]],b=dec[pixel[i+2]];signal[j]=r;signal[j+1]=g;signal[j+2]=b;const Y=.2126*r+.7152*g+.0722*b;curveHist[Math.min(63,Math.floor(Y*64))]++}
+ const source=$('before'),result=$('after');source.width=result.width=width;source.height=result.height=height;
+ source.getContext('2d').putImageData(data,0,0);$('filename').textContent=name;reset();
+}
+function demo(){
+ const canvas=document.createElement('canvas');canvas.width=720;canvas.height=450;const c=canvas.getContext('2d');
+ let sky=c.createLinearGradient(0,0,0,450);sky.addColorStop(0,'#263b65');sky.addColorStop(.34,'#719bb1');sky.addColorStop(.63,'#e9ae9e');sky.addColorStop(1,'#4a6a6e');c.fillStyle=sky;c.fillRect(0,0,720,450);
+ const orb=c.createRadialGradient(524,167,3,524,167,115);orb.addColorStop(0,'#fff6de');orb.addColorStop(.19,'#f8d7af');orb.addColorStop(.5,'#f0ae9877');orb.addColorStop(1,'#e48e9600');c.fillStyle=orb;c.fillRect(360,0,350,350);
+ c.fillStyle='#bd8e99';c.beginPath();c.moveTo(0,347);c.lineTo(137,175);c.lineTo(225,295);c.lineTo(346,141);c.lineTo(540,365);c.lineTo(720,226);c.lineTo(720,450);c.lineTo(0,450);c.fill();
+ c.fillStyle='#3d5c76';c.beginPath();c.moveTo(0,390);c.lineTo(159,286);c.lineTo(301,376);c.lineTo(496,256);c.lineTo(720,348);c.lineTo(720,450);c.lineTo(0,450);c.fill();
+ let field=c.createLinearGradient(0,325,0,450);field.addColorStop(0,'#a6a97b');field.addColorStop(.5,'#496d70');field.addColorStop(1,'#183a49');c.fillStyle=field;c.beginPath();c.moveTo(0,402);c.quadraticCurveTo(360,295,720,384);c.lineTo(720,450);c.lineTo(0,450);c.fill();
+ for(let i=0;i<450;i++){const x=(i*137.532)%720,y=365+(i*57.19)%80,rr=1+(i%6)*.45;c.fillStyle=['#e9d1a0','#ec9496','#a9c9cf','#f0b57c','#e5dfbd'][i%5];c.globalAlpha=.45+(i%7)*.07;c.beginPath();c.arc(x,y,rr,0,7);c.fill()}c.globalAlpha=1;
+ fromCanvas(canvas,'DEMO / LANDSCAPE');
+}
+$('demo').onclick=demo;
+$('file').addEventListener('change',e=>{let f=e.target.files?.[0];if(!f)return;const fr=new FileReader();fr.onerror=()=>{$('filename').textContent='読込エラー'};fr.onload=()=>{let image=new Image();image.onload=()=>{try{let k=Math.min(1,700/Math.max(image.naturalWidth,image.naturalHeight)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(image.naturalWidth*k));canvas.height=Math.max(1,Math.round(image.naturalHeight*k));canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);fromCanvas(canvas,f.name)}catch(err){$('filename').textContent='画像を処理できませんでした'}};image.onerror=()=>{$('filename').textContent='画像形式に非対応'};image.src=fr.result};fr.readAsDataURL(f)});
+function projected(r,g,b){const x=r-.5,y=g-.5,z=b-.5;const xx=x*Math.cos(yaw)-y*Math.sin(yaw),yy=x*Math.sin(yaw)+y*Math.cos(yaw);const zz=z*Math.cos(pitch)-yy*Math.sin(pitch);return [380+xx*343,320-zz*343]}
+function drawCube(){
+ const ctx=cube.getContext('2d'),W=cube.width,H=cube.height;let grad=ctx.createRadialGradient(365,320,35,380,330,470);grad.addColorStop(0,'#263e52');grad.addColorStop(.5,'#132537');grad.addColorStop(1,'#0d1928');ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+ for(let i=0;i<6;i++){ctx.strokeStyle='#91a7b916';ctx.lineWidth=1;ctx.beginPath();ctx.arc(380,315,130+i*56,0,7);ctx.stroke()}
+ const corners=[];for(let r=0;r<2;r++)for(let g=0;g<2;g++)for(let b=0;b<2;b++)corners.push({v:[r,g,b],p:projected(r,g,b)});
+ ctx.strokeStyle='#9abcd329';ctx.lineWidth=1;
+ for(let t=.25;t<1;t+=.25){for(let seg of [[[t,0,0],[t,1,0]],[[0,t,0],[1,t,0]],[[0,0,t],[1,0,t]],[[0,0,t],[0,1,t]]]){const a=projected(...seg[0]),b=projected(...seg[1]);ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke()}}
+ ctx.save();ctx.globalCompositeOperation='screen';
+ if(mode==='density'){
+  for(let pass=0;pass<2;pass++)for(let i=0;i<cloud.length;i++){
+   const [r,g,b,o]=cloud[i],p=projected(r,g,b);if(p[0]<0||p[0]>W||p[1]<0||p[1]>H)continue;
+   if(pass===0){let R=70+180*Math.sqrt(clip(r)),G=70+180*Math.sqrt(clip(g)),B=70+180*Math.sqrt(clip(b));ctx.fillStyle=o?'rgba(255,100,91,.022)':`rgba(${R|0},${G|0},${B|0},.025)`;ctx.beginPath();ctx.arc(p[0],p[1],o?7:5.6,0,7);ctx.fill()}
+   else{let R=65+190*Math.sqrt(clip(r)),G=65+190*Math.sqrt(clip(g)),B=65+190*Math.sqrt(clip(b));ctx.fillStyle=o?'rgba(255,110,97,.14)':`rgba(${R|0},${G|0},${B|0},.19)`;ctx.fillRect(p[0]-1.1,p[1]-1.1,2.2,2.2)}
+  }
+ }else for(let i=0;i<cloud.length;i++){const [r,g,b,o]=cloud[i],p=projected(r,g,b);if(p[0]<0||p[0]>W||p[1]<0||p[1]>H)continue;let R=60+195*Math.sqrt(clip(r)),G=60+195*Math.sqrt(clip(g)),B=60+195*Math.sqrt(clip(b));ctx.fillStyle=o?'rgba(255,129,108,.7)':`rgba(${R|0},${G|0},${B|0},.63)`;ctx.beginPath();ctx.arc(p[0],p[1],1.6,0,7);ctx.fill()}
+ ctx.restore();
+ for(let i=0;i<8;i++)for(let j=i+1;j<8;j++){let a=corners[i],b=corners[j],d=0;for(let k=0;k<3;k++)d+=+(a.v[k]!==b.v[k]);if(d!==1)continue;ctx.strokeStyle='#bed4e1ba';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(...a.p);ctx.lineTo(...b.p);ctx.stroke()}
+ const origin=projected(0,0,0);ctx.beginPath();ctx.arc(...origin,3.4,0,7);ctx.fillStyle='#eafaff';ctx.fill();ctx.font='12px system-ui';ctx.fillStyle='#a8c1d3';ctx.fillText('0',origin[0]+9,origin[1]+14);
+ for(const [label,r,g,b,color] of [['R',1,0,0,'#ff9b91'],['G',0,1,0,'#8aecd1'],['B',0,0,1,'#90caff']]){let p=projected(r,g,b);ctx.textAlign='center';ctx.font='bold 21px system-ui';ctx.fillStyle=color;ctx.fillText(label,p[0],p[1]-12)}
+ ctx.textAlign='left';ctx.fillStyle='#97b2c6';ctx.font='11px system-ui';ctx.fillText('RGB [0, 1]',18,H-22);
+ if(highOut){ctx.textAlign='right';ctx.fillStyle='#f6a8a0';ctx.fillText('● OUT OF RANGE',W-16,H-22)}
+}
+function scopeCoords(r,g,b){const R=enc(r),G=enc(g),B=enc(b);const Y=.2126*R+.7152*G+.0722*B;const cb=(B-Y)/1.8556,cr=(R-Y)/1.5748;return [255+cb*330,205-cr*330]}
+function drawScope(){
+ const ctx=scope.getContext('2d'),W=scope.width,H=scope.height;ctx.fillStyle='#13222f';ctx.fillRect(0,0,W,H);
+ for(let radius of [40,80,120,160]){ctx.strokeStyle='#b1c9d626';ctx.lineWidth=1;ctx.beginPath();ctx.arc(255,205,radius,0,7);ctx.stroke()}
+ ctx.strokeStyle='#b1c9d63b';ctx.beginPath();ctx.moveTo(25,205);ctx.lineTo(485,205);ctx.moveTo(255,10);ctx.lineTo(255,400);ctx.stroke();
+ ctx.setLineDash([2,5]);ctx.strokeStyle='#91a8bb1e';for(let a=0;a<Math.PI;a+=Math.PI/6){ctx.beginPath();ctx.moveTo(255-175*Math.cos(a),205-175*Math.sin(a));ctx.lineTo(255+175*Math.cos(a),205+175*Math.sin(a));ctx.stroke()}ctx.setLineDash([]);
+ const targets=[['R',1,0,0,'#fa8f89'],['G',0,1,0,'#73deb8'],['B',0,0,1,'#91baff'],['Y',1,1,0,'#ffdf83'],['C',0,1,1,'#87d7d9'],['M',1,0,1,'#e7ace7']];ctx.font='12px system-ui';ctx.textAlign='center';
+ for(const [text,r,g,b,col] of targets){let p=scopeCoords(r,g,b);ctx.strokeStyle=col+'99';ctx.lineWidth=1;ctx.strokeRect(p[0]-7,p[1]-7,14,14);ctx.fillStyle=col;ctx.fillText(text,p[0]+13,p[1]-8)}
+ ctx.save();ctx.globalCompositeOperation='screen';for(const [r,g,b] of scopePoints){let p=scopeCoords(r,g,b);ctx.fillStyle=`rgba(${Math.round(enc(r)*180+65)},${Math.round(enc(g)*180+65)},${Math.round(enc(b)*180+65)},.16)`;ctx.fillRect(p[0]-1.25,p[1]-1.25,2.5,2.5)}ctx.restore();
+ ctx.fillStyle='#8baabb';ctx.font='11px system-ui';ctx.textAlign='left';ctx.fillText('B′ − Y′',W-74,221);ctx.save();ctx.translate(245,68);ctx.rotate(-Math.PI/2);ctx.fillText('R′ − Y′',0,0);ctx.restore();ctx.fillStyle='#90a8b7';ctx.fillText('DISPLAY ENCODED',14,H-14);
+}
+function update(){if(!signal)return;const n=width*height,k=Math.pow(2,+ev.value),s=+sat.value/100;
+ $('evval').textContent=(+ev.value>=0?'+':'')+(+ev.value).toFixed(2)+' EV';$('satval').textContent=sat.value+'%';
+ const ctx=$('after').getContext('2d'),img=ctx.createImageData(width,height),a=img.data,mass=new Map();cloud=[];scopePoints=[];
+ let total=0,hi=0,lo=0,contact=0,max=0,overHi=[0,0,0],overLo=[0,0,0];
+ const sampleStep=Math.max(1,Math.floor(n/16000)),paletteStep=Math.max(1,Math.floor(n/32000));
+ for(let p=0;p<n;p++){
+  let j=3*p,i=4*p,v=apply(signal[j],signal[j+1],signal[j+2],k,s),up=false,down=false,touch=false;
+  for(let c=0;c<3;c++){
+   if(v[c]>1+1e-7){up=true;overHi[c]++;max=Math.max(max,v[c]-1)}
+   else if(v[c]<-1e-7){down=true;overLo[c]++;max=Math.max(max,-v[c])}
+   if(Math.abs(v[c])<1e-7||Math.abs(v[c]-1)<1e-7)touch=true;
+   a[i+c]=Math.round(255*enc(v[c]));
+  }
+  a[i+3]=255;if(up||down)total++;if(up)hi++;if(down)lo++;if(touch)contact++;
+  if(p%sampleStep===0){cloud.push([v[0],v[1],v[2],up||down]);scopePoints.push([v[0],v[1],v[2]])}
+  if(p%paletteStep===0){const bin=((a[i]>>4)<<8)|((a[i+1]>>4)<<4)|(a[i+2]>>4);mass.set(bin,(mass.get(bin)||0)+1)}
+ }
+ ctx.putImageData(img,0,0);highOut=total>0;$('outpct').textContent=fmt(total/n);$('highpct').textContent=fmt(hi/n);$('lowpct').textContent=fmt(lo/n);$('contact').textContent=fmt(contact/n);$('max').textContent=max.toFixed(3);$('count').textContent=n.toLocaleString('ja-JP');
+ const ch=$('channels');ch.replaceChildren();
+ ['R','G','B'].forEach((name,i)=>{
+  let row=document.createElement('div');row.className='chrow';let head=document.createElement('b');head.textContent=name;head.style.color=['#ce5144','#269777','#4176ce'][i];
+  let track=document.createElement('div');track.className='chbar';let hbar=document.createElement('span'),lbar=document.createElement('span');hbar.style.background='#d45b4c';lbar.style.background='#4788ab';hbar.style.width=(100*overHi[i]/n)+'%';lbar.style.width=(100*overLo[i]/n)+'%';track.append(hbar,lbar);
+  let label=document.createElement('span');label.className='right';label.textContent=fmt((overHi[i]+overLo[i])/n);row.append(head,track,label);ch.appendChild(row)
+ });
+ const pal=$('palette');pal.replaceChildren();for(const [bin,count] of [...mass.entries()].sort((a,b)=>b[1]-a[1]).slice(0,22)){let r=(bin>>8)&15,g=(bin>>4)&15,b=bin&15;let bar=document.createElement('i');bar.style.background=`rgb(${r*16+8},${g*16+8},${b*16+8})`;bar.style.flexGrow=Math.pow(count,.7);bar.title=`RGB ${r*16+8}, ${g*16+8}, ${b*16+8}`;pal.appendChild(bar)}
+ drawCube();drawScope();
+}
+function request(){if(scheduleFlag)return;scheduleFlag=true;requestAnimationFrame(()=>{scheduleFlag=false;update()})}
+ev.addEventListener('input',request);sat.addEventListener('input',request);
+function setMode(m){mode=m;$('density').classList.toggle('sel',m==='density');$('particles').classList.toggle('sel',m==='particles');drawCube()};$('density').onclick=()=>setMode('density');$('particles').onclick=()=>setMode('particles');$('view').onclick=()=>{yaw=.8;pitch=.52;drawCube()};
+let orbit=false,lx=0,ly=0;cube.addEventListener('pointerdown',e=>{orbit=true;lx=e.clientX;ly=e.clientY;cube.setPointerCapture(e.pointerId)});cube.addEventListener('pointermove',e=>{if(!orbit)return;yaw+=(e.clientX-lx)*.009;pitch=clip(pitch+(e.clientY-ly)*.007,-1.2,1.2);lx=e.clientX;ly=e.clientY;drawCube()});cube.addEventListener('pointerup',()=>orbit=false);cube.addEventListener('pointercancel',()=>orbit=false);
+buildCurve();demo();
+})();
+</script>
+</div></body></html>
