@@ -22,21 +22,19 @@ Use **LAB / 全体表示** for photographs and image-derived statistics. Use **C
 
 ### CUBE: uniform starting volume
 
-The Cube workspace is a **conceptual model, independent of any uploaded image**. It starts with **13,824 interior particles**, sampled with one deterministic point per cell in a 24 × 24 × 24 subdivision of the unit RGB cube. Another **3,456 explicit surface particles** lie on the six faces (24 × 24 per face); they can be highlighted independently.
+CUBE is an **image-independent concept visualizer**. It starts with 13,824 evenly stratified synthetic RGB samples: one point in each cell of a 24 × 24 × 24 division of the unit cube. All displayed particles use consistent size and nominal opacity.
 
-The same core adjustment types as LAB are supported, but with **independent state**: an editable per-channel **tone curve**, **exposure (EV)** and **saturation**. There is also an optional **signal Log** transform and an optional final **[0, 1] clip**. Processing order:
+The concept view offers independent exposure, saturation and an editable RGB tone curve (tap to add, drag to adjust), plus optional signal Log and clipping. These operations apply in the order:
 
 `Tone curve → signal Log → exposure → saturation → optional clip`
 
-When clipping is enabled, surface particles representing pre-clipped out-of-range signal values receive an orange halo. The displayed overflow fraction is measured **before clipping** and is calculated over the uniform interior samples. The original uniform volume stays faintly visible when a transformation is active; the twelve edges of the transformed cube are also traced.
+The original cube and point distribution remain faintly visible after a transform (ghost overlay). The twelve transformed edges are drawn to make the change of shape visible. **There is no extra surface-particle layer or surface highlighting.** The out-of-range percentage describes the interior samples *before* optional clipping.
 
-**Camera framing** is automatically adjusted to keep the original cube, transformed interior particles and transformed surface particles visible. The Cube starts from a more distant view than the LAB cube. A relative zoom slider (45–180%) can override this fitted camera scale, and “視点を戻す” restores default camera orientation and zoom.
+The camera automatically fits the full transformed object, including the exact transformed corners; zoom (45–180% of the fitted framing) remains adjustable. On phones, the cube follows scrolling as a floating mini-view while editing the concept curve, independently of the image-based LAB mode. The mini-view can be rotated, minimized, or moved to the other side of the screen.
 
-The coordinate view can independently be **Linear**, **sRGB**, or **normalized Log** (with adjustable strength). Coordinate changes affect only visualization, not the stored RGB values. For out-of-range signal values, coordinate transforms continue by endpoint tangent extrapolation.
+The view-coordinate mapping (Linear, sRGB or normalized Log) is independent of the signal transforms, and never changes the stored synthetic values. Display modes are particles (default in CUBE), density and Log density. Coordinate Log, signal Log, and density Log are three distinct operations.
 
-Display methods: **particles (Cube default)**, **density**, and **Log density**. The Log-density renderer changes screen-space accumulation, not the signal or 3D coordinates. Particle size/opacity are uniform within each rendering group; the concept begins with a spatially uniform 3D sampling density.
-
-The photo-based LAB workspace retains its own input, transforms, numerical analysis and vectorscope. Changes in the conceptual Cube never modify the loaded image.
+The photo-based LAB workspace retains its own image input, transforms, numerical analysis, vectorscope and normal small floating cube. CUBE edits do not change LAB image data.
 
 ## Try it
 
