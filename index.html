@@ -10,8 +10,42 @@
 #cfv3 .visgrid{display:grid;grid-template-columns:1fr;gap:12px}#cfv3 .scope{background:#13222f;border-radius:3px;position:relative}#cfv3 #cfv3-scope{display:block;width:100%;height:auto}#cfv3 .scopefooter{font-size:10px;color:#66777d;margin-top:6px}#cfv3 .photogrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}#cfv3 .photoframe{border:1px solid var(--line);background:#fffdf9;overflow:hidden}#cfv3 .photoframe span{display:block;color:#586b75;padding:6px 8px;font-size:10px;letter-spacing:.12em;font-weight:700}#cfv3 .photoframe canvas{width:100%;display:block;height:auto;background:#eff0ed}
 #cfv3 .swatch{height:31px;width:100%;display:flex;gap:3px;overflow:hidden;background:#e7e9e6}#cfv3 .swatch i{display:block;min-width:2px;flex-basis:0;height:100%}#cfv3 .controlbox{background:#fffdf9;border:1px solid var(--line);padding:13px}#cfv3 .controlhead{display:flex;align-items:center;justify-content:space-between;gap:12px}#cfv3 .btn{border:1px solid var(--ink);background:var(--ink);color:white;border-radius:3px;padding:9px 13px;font-weight:600;font-size:11px}#cfv3 .btn.soft{background:transparent;color:var(--ink);border-color:#aab5b5}#cfv3 .btn:active{transform:translateY(1px)}#cfv3 .ctrlrow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:13px 0}#cfv3 .ctrlrow label{display:flex;justify-content:space-between;gap:7px;font-size:12px}#cfv3 .ctrlrow output{font-variant-numeric:tabular-nums;font-weight:700;color:var(--accent)}#cfv3 input[type=range]{width:100%;height:24px;accent-color:var(--accent);margin:6px 0 0;cursor:pointer}#cfv3 #cfv3-curve{display:block;width:100%;height:auto;touch-action:none;background:#faf9f4;border:1px solid var(--line)}#cfv3 .curveactions{display:flex;gap:7px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:10px}#cfv3 .curveactions .btn{padding:7px 9px;font-size:10px}#cfv3 .fineprint{font-size:10px;color:#6f7e80;line-height:1.65;margin:13px 0 0;padding-bottom:7px}#cfv3 .mobilebreak{display:block}
 @media(min-width:700px){#cfv3{padding:25px}#cfv3 .main-grid{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(0,.82fr);gap:14px;align-items:start}#cfv3 .metricgrid{grid-template-columns:repeat(2,1fr)}#cfv3 .visgrid{grid-template-columns:1fr 1fr}#cfv3 .controlsgrid{display:grid;grid-template-columns:1fr 1fr;gap:15px}#cfv3 .mobilebreak{display:none}#cfv3 .sectionline{margin-top:22px}}
+
+/* Mobile: the original RGB cube remains in the page; this small companion
+   appears only when the original cube is above the viewport. */
+#cfv3 .cube-follow{display:none}
+@media(max-width:699px){
+ #cfv3 .cube-follow{
+  position:fixed;top:calc(9px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px));
+  z-index:1000;width:min(52vw,204px);overflow:hidden;border:1px solid #536d7d;
+  border-radius:12px;background:#102031;color:#e5f1f7;
+  box-shadow:0 10px 34px #101c2b55,0 1px 5px #101c2b33
+ }
+ #cfv3 .cube-follow.shown{display:block}
+ #cfv3 .cube-follow.leftside{right:auto;left:calc(10px + env(safe-area-inset-left,0px))}
+ #cfv3 .followhead{display:flex;align-items:center;gap:4px;padding:6px 7px 4px}
+ #cfv3 .followtitle{flex:1;min-width:0;font-size:10px;font-weight:750;letter-spacing:.1em;color:#c6e0eb;white-space:nowrap}
+ #cfv3 .followhead button{border:1px solid #59768a;background:#21374a;color:#e8f3f8;
+  border-radius:5px;font-size:13px;min-width:28px;min-height:29px;line-height:1;touch-action:manipulation}
+ #cfv3 #cfv3-floating-cube{display:block;width:100%;height:auto;touch-action:none;cursor:grab}
+ #cfv3 .followhint{font-size:9px;text-align:center;color:#8ca8bb;padding:0 5px 6px}
+ #cfv3 .cube-follow.compact{width:157px}
+ #cfv3 .cube-follow.compact #cfv3-floating-cube,
+ #cfv3 .cube-follow.compact .followhint{display:none}
+ #cfv3 .cube-follow.compact .followhead{padding:6px}
+}
 </style>
 <header class="mast"><div><div class="eyebrow">IMAGE SIGNAL / INTERACTIVE STUDY</div><h2>Color Field<span style="color:#df664f">.</span></h2></div><div class="mastsmall">RGB VISUALIZER<br>STUDY / 03</div></header>
+
+<div id="cfv3-floating" class="cube-follow" aria-label="追従RGBキューブ">
+ <div class="followhead">
+  <span class="followtitle">RGB CUBE · LIVE</span>
+  <button type="button" id="cfv3-floating-side" aria-label="表示位置を左右切り替え" title="左右を切り替え">↔</button>
+  <button type="button" id="cfv3-floating-toggle" aria-label="追従キューブを最小化" aria-expanded="true" title="最小化">−</button>
+ </div>
+ <canvas id="cfv3-floating-cube" width="570" height="477" aria-label="回転できる追従RGBキューブ"></canvas>
+ <div class="followhint">ドラッグして回転</div>
+</div>
 <div class="main-grid">
 <div><div class="sectionline"><strong>01 / COLOR SPACE</strong><span class="tiny">linear RGB · floating point</span></div><div class="stage"><div class="stagehead"><span class="stagelabel">RGB DISTRIBUTION</span><div class="toggle"><button id="cfv3-density" class="sel">密度</button><button id="cfv3-particles">粒子</button></div></div><canvas id="cfv3-cube" width="760" height="635"></canvas><div class="stagefoot"><span>ドラッグして回転 · 領域外も表示</span><button class="resetview" id="cfv3-view">視点を戻す</button></div></div></div>
 <div><div class="sectionline"><strong>02 / SIGNAL ANALYSIS</strong><span class="tiny">LIVE / ALL PIXELS</span></div><div class="metricgrid">
@@ -41,6 +75,7 @@ const enc=x=>{x=clip(x);return x<=.0031308?12.92*x:1.055*Math.pow(x,1/2.4)-.055}
 let width=0,height=0,signal=null,cloud=[],scopePoints=[],mode='density',yaw=.8,pitch=.52,scheduleFlag=false,highOut=false;
 let curveNodes=[],selected=-1,dragCurve=false,curveLut=new Float32Array(2049),curveHist=new Uint32Array(64);
 const cube=$('cube'),scope=$('scope'),curve=$('curve'),ev=$('ev'),sat=$('sat');
+const floating=$('floating'),floatingCanvas=$('floating-cube');
 function buildCurve(){
  const pts=[[0,0],...curveNodes,[1,1]],n=pts.length,dx=[],s=[],m=[];
  for(let i=0;i<n-1;i++){dx[i]=pts[i+1][0]-pts[i][0];s[i]=(pts[i+1][1]-pts[i][1])/dx[i]}
@@ -108,6 +143,7 @@ function demo(){
 }
 $('demo').onclick=demo;
 $('file').addEventListener('change',e=>{let f=e.target.files?.[0];if(!f)return;const fr=new FileReader();fr.onerror=()=>{$('filename').textContent='読込エラー'};fr.onload=()=>{let image=new Image();image.onload=()=>{try{let k=Math.min(1,700/Math.max(image.naturalWidth,image.naturalHeight)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(image.naturalWidth*k));canvas.height=Math.max(1,Math.round(image.naturalHeight*k));canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);fromCanvas(canvas,f.name)}catch(err){$('filename').textContent='画像を処理できませんでした'}};image.onerror=()=>{$('filename').textContent='画像形式に非対応'};image.src=fr.result};fr.readAsDataURL(f)});
+function syncFloatingCube(){const context=floatingCanvas.getContext('2d');context.drawImage(cube,0,0,floatingCanvas.width,floatingCanvas.height)}
 function projected(r,g,b){const x=r-.5,y=g-.5,z=b-.5;const xx=x*Math.cos(yaw)-y*Math.sin(yaw),yy=x*Math.sin(yaw)+y*Math.cos(yaw);const zz=z*Math.cos(pitch)-yy*Math.sin(pitch);return [380+xx*343,320-zz*343]}
 function drawCube(){
  const ctx=cube.getContext('2d'),W=cube.width,H=cube.height;let grad=ctx.createRadialGradient(365,320,35,380,330,470);grad.addColorStop(0,'#263e52');grad.addColorStop(.5,'#132537');grad.addColorStop(1,'#0d1928');ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
@@ -129,6 +165,7 @@ function drawCube(){
  for(const [label,r,g,b,color] of [['R',1,0,0,'#ff9b91'],['G',0,1,0,'#8aecd1'],['B',0,0,1,'#90caff']]){let p=projected(r,g,b);ctx.textAlign='center';ctx.font='bold 21px system-ui';ctx.fillStyle=color;ctx.fillText(label,p[0],p[1]-12)}
  ctx.textAlign='left';ctx.fillStyle='#97b2c6';ctx.font='11px system-ui';ctx.fillText('RGB [0, 1]',18,H-22);
  if(highOut){ctx.textAlign='right';ctx.fillStyle='#f6a8a0';ctx.fillText('● OUT OF RANGE',W-16,H-22)}
+ syncFloatingCube();
 }
 function scopeCoords(r,g,b){const R=enc(r),G=enc(g),B=enc(b);const Y=.2126*R+.7152*G+.0722*B;const cb=(B-Y)/1.8556,cr=(R-Y)/1.5748;return [255+cb*330,205-cr*330]}
 function drawScope(){
@@ -172,7 +209,43 @@ function request(){if(scheduleFlag)return;scheduleFlag=true;requestAnimationFram
 ev.addEventListener('input',request);sat.addEventListener('input',request);
 function setMode(m){mode=m;$('density').classList.toggle('sel',m==='density');$('particles').classList.toggle('sel',m==='particles');drawCube()};$('density').onclick=()=>setMode('density');$('particles').onclick=()=>setMode('particles');$('view').onclick=()=>{yaw=.8;pitch=.52;drawCube()};
 let orbit=false,lx=0,ly=0;cube.addEventListener('pointerdown',e=>{orbit=true;lx=e.clientX;ly=e.clientY;cube.setPointerCapture(e.pointerId)});cube.addEventListener('pointermove',e=>{if(!orbit)return;yaw+=(e.clientX-lx)*.009;pitch=clip(pitch+(e.clientY-ly)*.007,-1.2,1.2);lx=e.clientX;ly=e.clientY;drawCube()});cube.addEventListener('pointerup',()=>orbit=false);cube.addEventListener('pointercancel',()=>orbit=false);
-buildCurve();demo();
+
+ // Keep a smaller live version visible while mobile users edit controls below.
+ let floatingFramePending=false;
+ function updateFloatingVisibility(){
+  const original=cube.getBoundingClientRect(),page=root.getBoundingClientRect();
+  const mobile=window.matchMedia('(max-width:699px)').matches;
+  floating.classList.toggle('shown',mobile&&original.bottom<12&&page.bottom>120);
+ }
+ function scheduleFloatingVisibility(){
+  if(floatingFramePending)return;
+  floatingFramePending=true;
+  requestAnimationFrame(()=>{floatingFramePending=false;updateFloatingVisibility()});
+ }
+ window.addEventListener('scroll',scheduleFloatingVisibility,{passive:true});
+ window.addEventListener('resize',scheduleFloatingVisibility,{passive:true});
+ $('floating-side').addEventListener('click',()=>floating.classList.toggle('leftside'));
+ $('floating-toggle').addEventListener('click',()=>{
+  const compact=floating.classList.toggle('compact');
+  $('floating-toggle').textContent=compact?'+':'−';
+  $('floating-toggle').setAttribute('aria-expanded',String(!compact));
+  $('floating-toggle').setAttribute('aria-label',compact?'追従キューブを展開':'追従キューブを最小化');
+ });
+ let movingFloating=false,fx=0,fy=0;
+ floatingCanvas.addEventListener('pointerdown',e=>{
+  movingFloating=true;fx=e.clientX;fy=e.clientY;
+  floatingCanvas.setPointerCapture(e.pointerId);
+ });
+ floatingCanvas.addEventListener('pointermove',e=>{
+  if(!movingFloating)return;
+  yaw+=(e.clientX-fx)*.012;
+  pitch=clip(pitch+(e.clientY-fy)*.01,-1.2,1.2);
+  fx=e.clientX;fy=e.clientY;drawCube();
+ });
+ floatingCanvas.addEventListener('pointerup',()=>{movingFloating=false});
+ floatingCanvas.addEventListener('pointercancel',()=>{movingFloating=false});
+
+buildCurve();demo();updateFloatingVisibility();
 })();
 </script>
 </div></body></html>
