@@ -16,6 +16,16 @@ Load a photograph, adjust exposure, saturation, or the tone curve, and watch the
 - Local JPEG, PNG, WebP, or AVIF input **where supported by the browser**. A generated demo is included.
 - Single-file application: no build step, dependencies, account, or server-side image upload.
 
+## View modes
+
+Use the **LAB / 全体表示** and **CUBE / Cube専用** buttons to switch between the original analysis workspace and a larger, focused RGB cube.
+
+In Cube mode you can compare **Linear RGB**, **sRGB coordinate mapping**, and **normalized logarithmic coordinates**, with an adjustable Log parameter. Coordinate changes affect the visualization, not the stored signal or boundary statistics. For out-of-range signals the coordinate functions are extended from the endpoints by their tangents.
+
+Rendering modes are **uniform particles (default)**, **density**, and **Log density**. Uniform particles give sampled pixels equally sized and equally opaque marks; **they do not force the signal's actual distribution to be spatially uniform in RGB space**. Log density compresses counts per screen-space bin to reveal both sparse and crowded regions.
+
+Turn on **ghost / 元の点群を薄く重ねる** to show the unadjusted image samples faintly behind the transformed samples. The comparison overlay is shown when exposure, saturation, or the curve has changed. The original Lab screen and its detailed numerical analysis remain available.
+
 ## Try it
 
 Open [index.html](./index.html) in a modern browser. If GitHub Pages is enabled for this repository, the same file serves as the entry point.
