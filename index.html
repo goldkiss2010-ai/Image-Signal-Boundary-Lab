@@ -42,6 +42,37 @@
 #cfv3 .uploadcopy span{font-size:10px;color:var(--secondary)}
 #cfv3 .uploadbutton{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;cursor:pointer;font-size:13px;padding:12px 17px;min-height:46px;flex-shrink:0}
 @media(max-width:440px){#cfv3 .uploadbar{gap:10px}#cfv3 .uploadcopy strong{font-size:12px}#cfv3 .uploadcopy span{font-size:9px}#cfv3 .uploadbutton{padding:11px 12px;font-size:12px}}
+
+/* Secondary workspace: retain the full lab, but allow a cube-first view. */
+#cfv3 .workspace-switch{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:14px 0 5px}
+#cfv3 .workspace-switch button{border:1px solid var(--line);background:#e6e7e1;color:#67767c;padding:11px 13px;display:flex;justify-content:center;align-items:baseline;gap:9px;min-height:45px}
+#cfv3 .workspace-switch button span{font-size:10px;letter-spacing:.11em;font-weight:800}
+#cfv3 .workspace-switch button strong{font-size:13px}
+#cfv3 .workspace-switch button.active{background:var(--ink);color:#fff8ef;border-color:var(--ink)}
+#cfv3 .cube-tools{display:none;margin:12px 0 5px;border:1px solid var(--line);background:#fffdf9;padding:12px}
+#cfv3.cube-only .cube-tools{display:block}
+#cfv3 .cube-tool-head{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-bottom:12px}
+#cfv3 .cube-tool-head div{display:flex;flex-direction:column;gap:2px}
+#cfv3 .cube-tool-head strong{font-size:11px;letter-spacing:.06em}
+#cfv3 .cube-tool-head span{font-size:10px;color:var(--secondary)}
+#cfv3 #cfv3-focus-status{white-space:nowrap;font-size:10px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:750}
+#cfv3 .cube-tool-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:end;gap:12px}
+#cfv3 .cube-tool{display:flex;flex-direction:column;gap:4px;min-width:0}
+#cfv3 .cube-tool>span{font-size:11px;font-weight:650}
+#cfv3 .cube-tool select{height:38px;width:100%;min-width:0;padding:6px;border-radius:2px;background:#f7f6f0;color:var(--ink);border:1px solid #bdc7c6;font:inherit}
+#cfv3 .cube-tool output{color:var(--accent);font-variant-numeric:tabular-nums}
+#cfv3 .cube-tool input{margin:0}
+#cfv3 .cube-tool input:disabled{opacity:.3}
+#cfv3 .ghost-check{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:11px;grid-column:1/-1;font-weight:650;padding:3px 0}
+#cfv3 .ghost-check input{width:17px;height:17px;accent-color:var(--accent)}
+#cfv3 .cube-tools>p{font-size:10px;line-height:1.65;color:var(--secondary);margin:10px 0 0}
+#cfv3.cube-only .main-grid{display:block}
+#cfv3.cube-only .main-grid>div:nth-child(2){display:none}
+#cfv3.cube-only .visgrid{display:none}
+#cfv3.cube-only #cfv3-cube{max-height:76vh;width:auto;max-width:100%;margin:auto}
+#cfv3.cube-only .stage{margin-bottom:8px}
+#cfv3 .stagehead .toggle button{white-space:nowrap;padding:5px 7px}
+@media(max-width:699px){#cfv3.cube-only #cfv3-cube{height:auto;width:100%;max-height:none}#cfv3 .workspace-switch button{gap:6px;padding:9px 6px}#cfv3 .workspace-switch button strong{font-size:12px}#cfv3 .cube-tool-head{align-items:flex-start}#cfv3 .cube-tool-head span{max-width:220px}}
 </style>
 <header class="mast"><div><div class="eyebrow">IMAGE SIGNAL / INTERACTIVE STUDY</div><h2>Color Field<span style="color:#df664f">.</span></h2></div><div class="mastsmall">RGB VISUALIZER<br>STUDY / 03</div></header>
 <div class="uploadbar"><div class="uploadcopy"><strong>写真から始める</strong><span>JPEG / PNG / WebP / AVIF · 画像は端末内で処理</span></div><label for="cfv3-file" class="btn uploadbutton" role="button">＋ 写真を選ぶ</label><input id="cfv3-file" type="file" accept="image/jpeg,image/png,image/webp,image/avif" style="display:none"></div>
@@ -55,8 +86,22 @@
  <canvas id="cfv3-floating-cube" width="570" height="477" aria-label="回転できる追従RGBキューブ"></canvas>
  <div class="followhint">ドラッグして回転</div>
 </div>
+
+<nav class="workspace-switch" aria-label="表示モード">
+  <button type="button" id="cfv3-lab-tab" class="active" aria-pressed="true"><span>LAB</span><strong>全体表示</strong></button>
+  <button type="button" id="cfv3-cube-tab" aria-pressed="false"><span>CUBE</span><strong>Cube専用</strong></button>
+</nav>
+<section class="cube-tools" aria-label="RGBキューブの座標と比較">
+  <div class="cube-tool-head"><div><strong>COORDINATE & COMPARISON</strong><span>信号そのものと表示座標を区別して観察</span></div><span id="cfv3-focus-status">RANGE 0.00%</span></div>
+  <div class="cube-tool-grid">
+    <label class="cube-tool"><span>表示座標</span><select id="cfv3-coordinate" aria-label="表示座標"><option value="linear">Linear RGB</option><option value="srgb">sRGB（表示座標）</option><option value="log">Log（表示座標）</option></select></label>
+    <label class="cube-tool"><span>Log 強度 <output id="cfv3-log-value">9</output></span><input id="cfv3-log-power" type="range" min="1" max="60" step="1" value="9" disabled></label>
+    <label class="ghost-check"><input type="checkbox" id="cfv3-ghost" checked><span>元の点群を薄く重ねる</span></label>
+  </div>
+  <p>座標の変更では信号値・解析値は変わりません。薄い点群は入力時の位置です。密度表示はキューブ右上で切り替えられます。</p>
+</section>
 <div class="main-grid">
-<div><div class="sectionline"><strong>01 / COLOR SPACE</strong><span class="tiny">linear RGB · floating point</span></div><div class="stage"><div class="stagehead"><span class="stagelabel">RGB DISTRIBUTION</span><div class="toggle"><button id="cfv3-density" class="sel">密度</button><button id="cfv3-particles">粒子</button></div></div><canvas id="cfv3-cube" width="760" height="635"></canvas><div class="stagefoot"><span>ドラッグして回転 · 領域外も表示</span><button class="resetview" id="cfv3-view">視点を戻す</button></div></div></div>
+<div><div class="sectionline"><strong>01 / COLOR SPACE</strong><span class="tiny">linear RGB · floating point</span></div><div class="stage"><div class="stagehead"><span class="stagelabel">RGB DISTRIBUTION</span><div class="toggle"><button id="cfv3-density">密度</button><button id="cfv3-particles" class="sel">均一粒子</button><button id="cfv3-logdensity">Log密度</button></div></div><canvas id="cfv3-cube" width="760" height="635"></canvas><div class="stagefoot"><span>ドラッグして回転 · 領域外も表示</span><button class="resetview" id="cfv3-view">視点を戻す</button></div></div></div>
 <div><div class="sectionline"><strong>02 / SIGNAL ANALYSIS</strong><span class="tiny">LIVE / ALL PIXELS</span></div><div class="metricgrid">
 <div class="metric primary"><div class="mlabel">RGB領域外の画素</div><div class="mvalue" id="cfv3-outpct">0.00%</div><div class="units">いずれかの成分が 0–1 の外</div></div>
 <div class="metric"><div class="mlabel">上限超過</div><div class="mvalue" id="cfv3-highpct">0.00%</div><div class="units">いずれかが 1 より大</div></div>
@@ -81,7 +126,8 @@ const root=document.getElementById('cfv3');if(!root||root.dataset.init)return;ro
 const $=s=>root.querySelector('#cfv3-'+s),clip=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)),fmt=x=>(x*100).toFixed(2)+'%';
 const dec=Float32Array.from({length:256},(_,i)=>{let x=i/255;return x<=.04045?x/12.92:Math.pow((x+.055)/1.055,2.4)});
 const enc=x=>{x=clip(x);return x<=.0031308?12.92*x:1.055*Math.pow(x,1/2.4)-.055};
-let width=0,height=0,signal=null,cloud=[],scopePoints=[],mode='density',yaw=.8,pitch=.52,scheduleFlag=false,highOut=false;
+let width=0,height=0,signal=null,cloud=[],sourceCloud=[],scopePoints=[],mode='particles',yaw=.8,pitch=.52,scheduleFlag=false,highOut=false;
+let focusMode=false,coordMode='linear',logPower=9,ghostEnabled=true;
 let curveNodes=[],selected=-1,dragCurve=false,curveLut=new Float32Array(2049),curveHist=new Uint32Array(64);
 const cube=$('cube'),scope=$('scope'),curve=$('curve'),ev=$('ev'),sat=$('sat');
 const floating=$('floating'),floatingCanvas=$('floating-cube');
@@ -152,27 +198,98 @@ function demo(){
 }
 $('demo').onclick=demo;
 $('file').addEventListener('change',e=>{let f=e.target.files?.[0];if(!f)return;const fr=new FileReader();fr.onerror=()=>{$('filename').textContent='読込エラー'};fr.onload=()=>{let image=new Image();image.onload=()=>{try{let k=Math.min(1,700/Math.max(image.naturalWidth,image.naturalHeight)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(image.naturalWidth*k));canvas.height=Math.max(1,Math.round(image.naturalHeight*k));canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);fromCanvas(canvas,f.name)}catch(err){$('filename').textContent='画像を処理できませんでした'}};image.onerror=()=>{$('filename').textContent='画像形式に非対応'};image.src=fr.result};fr.readAsDataURL(f)});
+
+function mapChannel(x){
+ if(coordMode==='linear')return x;
+ if(coordMode==='srgb'){
+  if(x<0)return 12.92*x;
+  if(x>1)return 1+(1.055/2.4)*(x-1);
+  return x<=.0031308?12.92*x:1.055*Math.pow(x,1/2.4)-.055;
+ }
+ // Normalized logarithmic coordinates on [0,1], extended by tangent outside.
+ const d=Math.log1p(logPower);
+ if(x<0)return logPower*x/d;
+ if(x>1)return 1+(logPower/((1+logPower)*d))*(x-1);
+ return Math.log1p(logPower*x)/d;
+}
+function drawGhost(ctx,W,H){
+ const moved=+ev.value!==0||+sat.value!==100||curveNodes.length!==0;
+ if(!focusMode||!ghostEnabled||!moved)return;
+ ctx.save();ctx.globalCompositeOperation='screen';
+ ctx.fillStyle='rgba(164,204,232,.20)';
+ for(let i=0;i<sourceCloud.length;i+=2){
+  const p=projected(...sourceCloud[i]);
+  if(p[0]<0||p[0]>=W||p[1]<0||p[1]>=H)continue;
+  ctx.fillRect(p[0]-1.1,p[1]-1.1,2.2,2.2);
+ }
+ ctx.restore();
+}
+function drawLogDensity(ctx,W,H){
+ // Bin by screen position; opacity is logarithmic in the number of sampled pixels.
+ const bins=new Map(),cell=4;
+ for(const [r,g,b,overflow] of cloud){
+  const p=projected(r,g,b);
+  if(p[0]<0||p[0]>=W||p[1]<0||p[1]>=H)continue;
+  const x=Math.floor(p[0]/cell),y=Math.floor(p[1]/cell),key=y*10000+x;
+  let rec=bins.get(key);
+  if(!rec){rec={x,y,n:0,r:0,g:0,b:0,out:0};bins.set(key,rec)}
+  rec.n++;rec.r+=Math.sqrt(clip(r));rec.g+=Math.sqrt(clip(g));rec.b+=Math.sqrt(clip(b));rec.out+=overflow?1:0;
+ }
+ let peak=1;for(const v of bins.values())peak=Math.max(peak,v.n);
+ const den=Math.log1p(peak);
+ ctx.save();ctx.globalCompositeOperation='screen';
+ for(const v of bins.values()){
+  const strength=Math.log1p(v.n)/den;
+  const alpha=Math.min(.96,.12+.82*strength);
+  const r=Math.round(50+205*(v.r/v.n)),g=Math.round(50+205*(v.g/v.n)),b=Math.round(50+205*(v.b/v.n));
+  ctx.fillStyle=v.out/v.n>.4?`rgba(255,125,112,${alpha})`:`rgba(${r},${g},${b},${alpha})`;
+  ctx.fillRect(v.x*cell,v.y*cell,cell,cell);
+ }
+ ctx.restore();
+}
+function selectWorkspace(focus){
+ focusMode=focus;
+ root.classList.toggle('cube-only',focus);
+ $('lab-tab').classList.toggle('active',!focus);$('cube-tab').classList.toggle('active',focus);
+ $('lab-tab').setAttribute('aria-pressed',String(!focus));
+ $('cube-tab').setAttribute('aria-pressed',String(focus));
+ drawCube();
+ updateFloatingVisibility();
+}
+$('lab-tab').addEventListener('click',()=>selectWorkspace(false));
+$('cube-tab').addEventListener('click',()=>selectWorkspace(true));
+$('coordinate').addEventListener('change',e=>{
+ coordMode=e.target.value;$('log-power').disabled=coordMode!=='log';drawCube();
+});
+$('log-power').addEventListener('input',e=>{logPower=+e.target.value;$('log-value').textContent=String(logPower);drawCube()});
+$('ghost').addEventListener('change',e=>{ghostEnabled=e.target.checked;drawCube()});
 function syncFloatingCube(){const context=floatingCanvas.getContext('2d');context.drawImage(cube,0,0,floatingCanvas.width,floatingCanvas.height)}
-function projected(r,g,b){const x=r-.5,y=g-.5,z=b-.5;const xx=x*Math.cos(yaw)-y*Math.sin(yaw),yy=x*Math.sin(yaw)+y*Math.cos(yaw);const zz=z*Math.cos(pitch)-yy*Math.sin(pitch);return [380+xx*343,320-zz*343]}
+function projected(r,g,b){const x=mapChannel(r)-.5,y=mapChannel(g)-.5,z=mapChannel(b)-.5;const xx=x*Math.cos(yaw)-y*Math.sin(yaw),yy=x*Math.sin(yaw)+y*Math.cos(yaw);const zz=z*Math.cos(pitch)-yy*Math.sin(pitch);return [380+xx*343,320-zz*343]}
 function drawCube(){
  const ctx=cube.getContext('2d'),W=cube.width,H=cube.height;let grad=ctx.createRadialGradient(365,320,35,380,330,470);grad.addColorStop(0,'#263e52');grad.addColorStop(.5,'#132537');grad.addColorStop(1,'#0d1928');ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
  for(let i=0;i<6;i++){ctx.strokeStyle='#91a7b916';ctx.lineWidth=1;ctx.beginPath();ctx.arc(380,315,130+i*56,0,7);ctx.stroke()}
  const corners=[];for(let r=0;r<2;r++)for(let g=0;g<2;g++)for(let b=0;b<2;b++)corners.push({v:[r,g,b],p:projected(r,g,b)});
  ctx.strokeStyle='#9abcd329';ctx.lineWidth=1;
  for(let t=.25;t<1;t+=.25){for(let seg of [[[t,0,0],[t,1,0]],[[0,t,0],[1,t,0]],[[0,0,t],[1,0,t]],[[0,0,t],[0,1,t]]]){const a=projected(...seg[0]),b=projected(...seg[1]);ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke()}}
+ drawGhost(ctx,W,H);
+ if(mode==='logdensity'){drawLogDensity(ctx,W,H)}
+ else if(mode==='density'){
  ctx.save();ctx.globalCompositeOperation='screen';
- if(mode==='density'){
   for(let pass=0;pass<2;pass++)for(let i=0;i<cloud.length;i++){
    const [r,g,b,o]=cloud[i],p=projected(r,g,b);if(p[0]<0||p[0]>W||p[1]<0||p[1]>H)continue;
    if(pass===0){let R=70+180*Math.sqrt(clip(r)),G=70+180*Math.sqrt(clip(g)),B=70+180*Math.sqrt(clip(b));ctx.fillStyle=o?'rgba(255,100,91,.022)':`rgba(${R|0},${G|0},${B|0},.025)`;ctx.beginPath();ctx.arc(p[0],p[1],o?7:5.6,0,7);ctx.fill()}
    else{let R=65+190*Math.sqrt(clip(r)),G=65+190*Math.sqrt(clip(g)),B=65+190*Math.sqrt(clip(b));ctx.fillStyle=o?'rgba(255,110,97,.14)':`rgba(${R|0},${G|0},${B|0},.19)`;ctx.fillRect(p[0]-1.1,p[1]-1.1,2.2,2.2)}
   }
- }else for(let i=0;i<cloud.length;i++){const [r,g,b,o]=cloud[i],p=projected(r,g,b);if(p[0]<0||p[0]>W||p[1]<0||p[1]>H)continue;let R=60+195*Math.sqrt(clip(r)),G=60+195*Math.sqrt(clip(g)),B=60+195*Math.sqrt(clip(b));ctx.fillStyle=o?'rgba(255,129,108,.7)':`rgba(${R|0},${G|0},${B|0},.63)`;ctx.beginPath();ctx.arc(p[0],p[1],1.6,0,7);ctx.fill()}
  ctx.restore();
+ }else{
+ ctx.save();ctx.globalCompositeOperation='screen';
+ for(let i=0;i<cloud.length;i++){const [r,g,b,o]=cloud[i],p=projected(r,g,b);if(p[0]<0||p[0]>W||p[1]<0||p[1]>H)continue;let R=60+195*Math.sqrt(clip(r)),G=60+195*Math.sqrt(clip(g)),B=60+195*Math.sqrt(clip(b));ctx.fillStyle=o?'rgba(255,129,108,.7)':`rgba(${R|0},${G|0},${B|0},.63)`;ctx.beginPath();ctx.arc(p[0],p[1],1.6,0,7);ctx.fill()}
+ ctx.restore();
+ }
  for(let i=0;i<8;i++)for(let j=i+1;j<8;j++){let a=corners[i],b=corners[j],d=0;for(let k=0;k<3;k++)d+=+(a.v[k]!==b.v[k]);if(d!==1)continue;ctx.strokeStyle='#bed4e1ba';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(...a.p);ctx.lineTo(...b.p);ctx.stroke()}
  const origin=projected(0,0,0);ctx.beginPath();ctx.arc(...origin,3.4,0,7);ctx.fillStyle='#eafaff';ctx.fill();ctx.font='12px system-ui';ctx.fillStyle='#a8c1d3';ctx.fillText('0',origin[0]+9,origin[1]+14);
  for(const [label,r,g,b,color] of [['R',1,0,0,'#ff9b91'],['G',0,1,0,'#8aecd1'],['B',0,0,1,'#90caff']]){let p=projected(r,g,b);ctx.textAlign='center';ctx.font='bold 21px system-ui';ctx.fillStyle=color;ctx.fillText(label,p[0],p[1]-12)}
- ctx.textAlign='left';ctx.fillStyle='#97b2c6';ctx.font='11px system-ui';ctx.fillText('RGB [0, 1]',18,H-22);
+ ctx.textAlign='left';ctx.fillStyle='#97b2c6';ctx.font='11px system-ui';ctx.fillText('RGB [0, 1] · '+coordMode.toUpperCase(),18,H-22);
  if(highOut){ctx.textAlign='right';ctx.fillStyle='#f6a8a0';ctx.fillText('● OUT OF RANGE',W-16,H-22)}
  syncFloatingCube();
 }
@@ -189,7 +306,7 @@ function drawScope(){
 }
 function update(){if(!signal)return;const n=width*height,k=Math.pow(2,+ev.value),s=+sat.value/100;
  $('evval').textContent=(+ev.value>=0?'+':'')+(+ev.value).toFixed(2)+' EV';$('satval').textContent=sat.value+'%';
- const ctx=$('after').getContext('2d'),img=ctx.createImageData(width,height),a=img.data,mass=new Map();cloud=[];scopePoints=[];
+ const ctx=$('after').getContext('2d'),img=ctx.createImageData(width,height),a=img.data,mass=new Map();cloud=[];sourceCloud=[];scopePoints=[];
  let total=0,hi=0,lo=0,contact=0,max=0,overHi=[0,0,0],overLo=[0,0,0];
  const sampleStep=Math.max(1,Math.floor(n/16000)),paletteStep=Math.max(1,Math.floor(n/32000));
  for(let p=0;p<n;p++){
@@ -201,10 +318,10 @@ function update(){if(!signal)return;const n=width*height,k=Math.pow(2,+ev.value)
    a[i+c]=Math.round(255*enc(v[c]));
   }
   a[i+3]=255;if(up||down)total++;if(up)hi++;if(down)lo++;if(touch)contact++;
-  if(p%sampleStep===0){cloud.push([v[0],v[1],v[2],up||down]);scopePoints.push([v[0],v[1],v[2]])}
+  if(p%sampleStep===0){cloud.push([v[0],v[1],v[2],up||down]);sourceCloud.push([signal[j],signal[j+1],signal[j+2]]);scopePoints.push([v[0],v[1],v[2]])}
   if(p%paletteStep===0){const bin=((a[i]>>4)<<8)|((a[i+1]>>4)<<4)|(a[i+2]>>4);mass.set(bin,(mass.get(bin)||0)+1)}
  }
- ctx.putImageData(img,0,0);highOut=total>0;$('outpct').textContent=fmt(total/n);$('highpct').textContent=fmt(hi/n);$('lowpct').textContent=fmt(lo/n);$('contact').textContent=fmt(contact/n);$('max').textContent=max.toFixed(3);$('count').textContent=n.toLocaleString('ja-JP');
+ ctx.putImageData(img,0,0);highOut=total>0;$('focus-status').textContent='OUTSIDE '+fmt(total/n);$('outpct').textContent=fmt(total/n);$('highpct').textContent=fmt(hi/n);$('lowpct').textContent=fmt(lo/n);$('contact').textContent=fmt(contact/n);$('max').textContent=max.toFixed(3);$('count').textContent=n.toLocaleString('ja-JP');
  const ch=$('channels');ch.replaceChildren();
  ['R','G','B'].forEach((name,i)=>{
   let row=document.createElement('div');row.className='chrow';let head=document.createElement('b');head.textContent=name;head.style.color=['#ce5144','#269777','#4176ce'][i];
@@ -216,7 +333,7 @@ function update(){if(!signal)return;const n=width*height,k=Math.pow(2,+ev.value)
 }
 function request(){if(scheduleFlag)return;scheduleFlag=true;requestAnimationFrame(()=>{scheduleFlag=false;update()})}
 ev.addEventListener('input',request);sat.addEventListener('input',request);
-function setMode(m){mode=m;$('density').classList.toggle('sel',m==='density');$('particles').classList.toggle('sel',m==='particles');drawCube()};$('density').onclick=()=>setMode('density');$('particles').onclick=()=>setMode('particles');$('view').onclick=()=>{yaw=.8;pitch=.52;drawCube()};
+function setMode(m){mode=m;$('density').classList.toggle('sel',m==='density');$('particles').classList.toggle('sel',m==='particles');$('logdensity').classList.toggle('sel',m==='logdensity');drawCube()};$('density').onclick=()=>setMode('density');$('particles').onclick=()=>setMode('particles');$('logdensity').onclick=()=>setMode('logdensity');$('view').onclick=()=>{yaw=.8;pitch=.52;drawCube()};
 let orbit=false,lx=0,ly=0;cube.addEventListener('pointerdown',e=>{orbit=true;lx=e.clientX;ly=e.clientY;cube.setPointerCapture(e.pointerId)});cube.addEventListener('pointermove',e=>{if(!orbit)return;yaw+=(e.clientX-lx)*.009;pitch=clip(pitch+(e.clientY-ly)*.007,-1.2,1.2);lx=e.clientX;ly=e.clientY;drawCube()});cube.addEventListener('pointerup',()=>orbit=false);cube.addEventListener('pointercancel',()=>orbit=false);
 
  // Keep a smaller live version visible while mobile users edit controls below.
