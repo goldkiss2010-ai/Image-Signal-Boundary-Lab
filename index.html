@@ -80,6 +80,10 @@
 #cfv3 .concept-actions .btn{font-size:11px;padding:7px 9px}
 #cfv3 .concept-subtitle{font-size:10px;color:var(--secondary);font-weight:750;letter-spacing:.08em;padding:12px 0 10px}
 #cfv3.cube-only .uploadbar,#cfv3.cube-only .controlsgrid{display:none}
+#cfv3 .surface-camera{padding-bottom:7px;border-bottom:1px solid var(--line)}
+#cfv3 .surface-camera .ghost-check{grid-column:auto;font-weight:550}
+#cfv3 .surface-camera .cube-tool{grid-column:auto}
+@media(max-width:540px){#cfv3 .surface-camera{grid-template-columns:1fr}#cfv3 .surface-camera .cube-tool{grid-column:1}}
 @media(max-width:430px){#cfv3 .concept-controls{gap:12px 9px}}
 </style>
 <header class="mast"><div><div class="eyebrow">IMAGE SIGNAL / INTERACTIVE STUDY</div><h2>Color Field<span style="color:#df664f">.</span></h2></div><div class="mastsmall">RGB VISUALIZER<br>STUDY / 03</div></header>
@@ -100,12 +104,18 @@
   <button type="button" id="cfv3-cube-tab" aria-pressed="false"><span>CUBE</span><strong>均一RGB立方体</strong></button>
 </nav>
 <section class="cube-tools" aria-label="RGBキューブの座標と比較">
-  <div class="cube-tool-head"><div><strong>UNIFORM RGB VOLUME · CONCEPT</strong><span>写真を使わず、RGB立方体を変形する</span></div><span id="cfv3-focus-status">OUTSIDE 0.00%</span></div>
+  <div class="cube-tool-head"><div><strong>UNIFORM RGB VOLUME · CONCEPT</strong><span>写真を使わず、RGB立方体を変形する</span></div><span id="cfv3-focus-status">PRE-CLIP 0.00%</span></div>
   <div class="concept-controls">
  <label class="cube-tool"><span>露出 <output id="cfv3-cev-text">+0.00 EV</output></span><input id="cfv3-cev" type="range" min="-2" max="2" step=".05" value="0"></label>
  <label class="cube-tool"><span>彩度 <output id="cfv3-csat-text">100%</output></span><input id="cfv3-csat" type="range" min="0" max="200" step="5" value="100"></label>
  <label class="cube-tool"><span>信号のLog変換 <output id="cfv3-ctone-text">0</output></span><input id="cfv3-ctone" type="range" min="0" max="30" step="1" value="0"></label>
  <div class="concept-actions"><label class="ghost-check"><input id="cfv3-cclip" type="checkbox"><span>[0, 1] へクリップ</span></label><button class="btn soft" type="button" id="cfv3-creset">リセット</button></div>
+</div>
+
+<div class="concept-subtitle">SURFACE & CAMERA</div>
+<div class="cube-tool-grid surface-camera">
+ <label class="ghost-check"><input type="checkbox" id="cfv3-surface" checked><span>変形した立方体の表面粒子を強調</span></label>
+ <label class="cube-tool"><span>カメラ距離（自動フィット基準） <output id="cfv3-zoom-text">100%</output></span><input id="cfv3-zoom" type="range" min="45" max="180" step="5" value="100"></label>
 </div>
 <div class="concept-subtitle">VIEW COORDINATES · 信号は変えない</div>
 <div class="cube-tool-grid">
@@ -113,7 +123,7 @@
     <label class="cube-tool"><span>Log 強度 <output id="cfv3-log-value">9</output></span><input id="cfv3-log-power" type="range" min="1" max="60" step="1" value="9" disabled></label>
     <label class="ghost-check"><input type="checkbox" id="cfv3-ghost" checked><span>元の均一な立方体を薄く重ねる</span></label>
   </div>
-  <p>均一に配置した標本点に操作を適用します。「信号のLog」はデータを変形し、「表示座標のLog」は観察位置だけを変えます。上部の超過率はクリップ前の値です。</p>
+  <p>均一な内部標本と、元の6面に配置した表面標本を同じ変換で動かします。カメラは変形後の全体に自動フィットします。Log信号とLog表示座標は別の操作で、超過率はクリップ前に評価します。</p>
 </section>
 <div class="main-grid">
 <div><div class="sectionline"><strong>01 / COLOR SPACE</strong><span class="tiny">linear RGB · floating point</span></div><div class="stage"><div class="stagehead"><span class="stagelabel">RGB DISTRIBUTION <span id="cfv3-cube-kind">· IMAGE</span></span><div class="toggle"><button id="cfv3-density">密度</button><button id="cfv3-particles" class="sel">均一粒子</button><button id="cfv3-logdensity">Log密度</button></div></div><canvas id="cfv3-cube" width="760" height="635"></canvas><div class="stagefoot"><span>ドラッグして回転 · 領域外も表示</span><button class="resetview" id="cfv3-view">視点を戻す</button></div></div></div>
@@ -153,23 +163,34 @@ for(let z=0;z<24;z++)for(let y=0;y<24;y++)for(let x=0;x<24;x++){
  const j1=((hash%997)/997-.5)*.3,j2=(((hash>>>9)%997)/997-.5)*.3,j3=(((hash>>>18)%997)/997-.5)*.3;
  uniformCube.push([(x+.5+j1)/24,(y+.5+j2)/24,(z+.5+j3)/24]);
 }
-let transformedCube=[],conceptDirty=false,conceptOverflow=0;
+const uniformSurface=[];
+for(let axis=0;axis<3;axis++)for(let face=0;face<2;face++)
+ for(let u=0;u<24;u++)for(let v=0;v<24;v++){
+  const p=[0,0,0];p[axis]=face;
+  p[(axis+1)%3]=(u+.5)/24;p[(axis+2)%3]=(v+.5)/24;
+  uniformSurface.push(p);
+ }
+let transformedCube=[],transformedSurface=[],conceptDirty=false,conceptOverflow=0;
+let viewZoom=1,viewScale=343,viewCenter=[0,0];
+function transformConcept(v,params){
+ let r=v[0],g=v[1],b=v[2],a=params.a,s=params.s,k=params.k;
+ if(a){const d=Math.log1p(a);r=Math.log1p(a*r)/d;g=Math.log1p(a*g)/d;b=Math.log1p(a*b)/d}
+ const y=.2126*r+.7152*g+.0722*b;
+ r=k*(y+s*(r-y));g=k*(y+s*(g-y));b=k*(y+s*(b-y));
+ const overflow=(r<0||r>1||g<0||g>1||b<0||b>1);
+ if(params.clipping){r=clip(r);g=clip(g);b=clip(b)}
+ return [r,g,b,overflow];
+}
 function recalcConcept(){
- const e=+$('cev').value,s=+$('csat').value/100,a=+$('ctone').value,doClip=$('cclip').checked;
- const k=Math.pow(2,e),den=a?Math.log1p(a):1;
+ const e=+$('cev').value,s=+$('csat').value/100,a=+$('ctone').value;
+ const params={k:Math.pow(2,e),s,a,clipping:$('cclip').checked};
  let outside=0;
- transformedCube=uniformCube.map(v=>{
-  let r=v[0],g=v[1],b=v[2];
-  if(a){r=Math.log1p(a*r)/den;g=Math.log1p(a*g)/den;b=Math.log1p(a*b)/den}
-  const y=.2126*r+.7152*g+.0722*b;
-  r=k*(y+s*(r-y));g=k*(y+s*(g-y));b=k*(y+s*(b-y));
-  const out=(r<0||r>1||g<0||g>1||b<0||b>1);
-  if(out)outside++;
-  if(doClip){r=clip(r);g=clip(g);b=clip(b)}
-  return [r,g,b,out];
+ transformedCube=uniformCube.map(p=>{
+  const out=transformConcept(p,params);if(out[3])outside++;return out;
  });
+ transformedSurface=uniformSurface.map(p=>transformConcept(p,params));
  conceptOverflow=outside/uniformCube.length;
- conceptDirty=Boolean(e||s!==1||a||doClip);
+ conceptDirty=Boolean(e||s!==1||a||params.clipping);
  $('cev-text').textContent=(e>=0?'+':'')+e.toFixed(2)+' EV';
  $('csat-text').textContent=$('csat').value+'%';
  $('ctone-text').textContent=String(a);
@@ -320,14 +341,59 @@ $('coordinate').addEventListener('change',e=>{
 });
 $('log-power').addEventListener('input',e=>{logPower=+e.target.value;$('log-value').textContent=String(logPower);drawCube()});
 $('ghost').addEventListener('change',e=>{ghostEnabled=e.target.checked;drawCube()});
+$('surface').addEventListener('change',()=>{if(focusMode)drawCube()});
+$('zoom').addEventListener('input',e=>{viewZoom=(+e.target.value)/100;$('zoom-text').textContent=e.target.value+'%';if(focusMode)drawCube()});
 function syncFloatingCube(){const context=floatingCanvas.getContext('2d');context.drawImage(cube,0,0,floatingCanvas.width,floatingCanvas.height)}
-function projected(r,g,b){const x=(focusMode?mapChannel(r):r)-.5,y=(focusMode?mapChannel(g):g)-.5,z=(focusMode?mapChannel(b):b)-.5;const xx=x*Math.cos(yaw)-y*Math.sin(yaw),yy=x*Math.sin(yaw)+y*Math.cos(yaw);const zz=z*Math.cos(pitch)-yy*Math.sin(pitch);return [380+xx*343,320-zz*343]}
+function orientedPosition(r,g,b){
+ const x=(focusMode?mapChannel(r):r)-.5;
+ const y=(focusMode?mapChannel(g):g)-.5;
+ const z=(focusMode?mapChannel(b):b)-.5;
+ const xx=x*Math.cos(yaw)-y*Math.sin(yaw),yy=x*Math.sin(yaw)+y*Math.cos(yaw);
+ return [xx,z*Math.cos(pitch)-yy*Math.sin(pitch)];
+}
+function fitConceptCamera(){
+ if(!focusMode){viewScale=343;viewCenter=[0,0];return}
+ let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+ function accumulate(r,g,b){
+  const [x,y]=orientedPosition(r,g,b);
+  if(!Number.isFinite(x)||!Number.isFinite(y))return;
+  minX=Math.min(minX,x);maxX=Math.max(maxX,x);
+  minY=Math.min(minY,y);maxY=Math.max(maxY,y);
+ }
+ // Always frame the reference unit cube and transformed signal (even when clipped).
+ for(let r=0;r<=1;r++)for(let g=0;g<=1;g++)for(let b=0;b<=1;b++)accumulate(r,g,b);
+ for(let i=0;i<transformedCube.length;i++)accumulate(...transformedCube[i]);
+ for(let i=0;i<transformedSurface.length;i++)accumulate(...transformedSurface[i]);
+ const spanX=Math.max(.01,maxX-minX),spanY=Math.max(.01,maxY-minY);
+ viewCenter=[(minX+maxX)/2,(minY+maxY)/2];
+ // Smaller starting scale, then automatically zoom out further for expanded forms.
+ viewScale=Math.min(200,Math.min(640/spanX,525/spanY)*.82)*viewZoom;
+}
+function projected(r,g,b){
+ const [x,y]=orientedPosition(r,g,b);
+ return [380+(x-viewCenter[0])*viewScale,320-(y-viewCenter[1])*viewScale];
+}
 function conceptEdgePoint(v){
- let r=v[0],g=v[1],b=v[2],a=+$('ctone').value,s=+$('csat').value/100,k=Math.pow(2,+$('cev').value);
- if(a){const d=Math.log1p(a);r=Math.log1p(a*r)/d;g=Math.log1p(a*g)/d;b=Math.log1p(a*b)/d}
- const y=.2126*r+.7152*g+.0722*b;
- const q=[k*(y+s*(r-y)),k*(y+s*(g-y)),k*(y+s*(b-y))];
- return $('cclip').checked?q.map(t=>clip(t)):q;
+ return transformConcept(v,{k:Math.pow(2,+$('cev').value),s:+$('csat').value/100,a:+$('ctone').value,clipping:$('cclip').checked});
+}
+function drawSurfaceParticles(ctx,W,H){
+ const overClip=$('cclip').checked;
+ ctx.save();ctx.globalCompositeOperation='screen';
+ for(const p of transformedSurface){
+  const q=projected(p[0],p[1],p[2]);if(q[0]<0||q[0]>=W||q[1]<0||q[1]>=H)continue;
+  const r=Math.round(80+175*Math.sqrt(clip(p[0])));
+  const g=Math.round(80+175*Math.sqrt(clip(p[1])));
+  const b=Math.round(80+175*Math.sqrt(clip(p[2])));
+  // Orange outline/halo indicates pre-clip overflow that has collapsed onto a face.
+  if(overClip&&p[3]){
+   ctx.fillStyle='rgba(255,166,111,.68)';
+   ctx.beginPath();ctx.arc(q[0],q[1],2.7,0,7);ctx.fill();
+  }else{
+   ctx.fillStyle=`rgba(${r},${g},${b},.79)`;
+   ctx.beginPath();ctx.arc(q[0],q[1],1.8,0,7);ctx.fill();
+  }
+ }
+ ctx.restore();
 }
 function drawConceptEdges(ctx){
  ctx.save();ctx.beginPath();ctx.strokeStyle='#bde9f0bb';ctx.lineWidth=1.8;
@@ -341,6 +407,7 @@ function drawConceptEdges(ctx){
  ctx.stroke();ctx.restore();
 }
 function drawCube(){
+ fitConceptCamera();
  const current=activeCubeCloud();
  const ctx=cube.getContext('2d'),W=cube.width,H=cube.height;let grad=ctx.createRadialGradient(365,320,35,380,330,470);grad.addColorStop(0,'#263e52');grad.addColorStop(.5,'#132537');grad.addColorStop(1,'#0d1928');ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
  for(let i=0;i<6;i++){ctx.strokeStyle='#91a7b916';ctx.lineWidth=1;ctx.beginPath();ctx.arc(380,315,130+i*56,0,7);ctx.stroke()}
@@ -362,12 +429,13 @@ function drawCube(){
  for(let i=0;i<current.length;i++){const [r,g,b,o]=current[i],p=projected(r,g,b);if(p[0]<0||p[0]>W||p[1]<0||p[1]>H)continue;let R=60+195*Math.sqrt(clip(r)),G=60+195*Math.sqrt(clip(g)),B=60+195*Math.sqrt(clip(b));ctx.fillStyle=o?'rgba(255,129,108,.7)':`rgba(${R|0},${G|0},${B|0},.63)`;ctx.beginPath();ctx.arc(p[0],p[1],1.6,0,7);ctx.fill()}
  ctx.restore();
  }
+ if(focusMode&&$('surface').checked)drawSurfaceParticles(ctx,W,H);
  if(focusMode)drawConceptEdges(ctx);
  for(let i=0;i<8;i++)for(let j=i+1;j<8;j++){let a=corners[i],b=corners[j],d=0;for(let k=0;k<3;k++)d+=+(a.v[k]!==b.v[k]);if(d!==1)continue;ctx.strokeStyle=focusMode?'#b2cdd052':'#bed4e1ba';ctx.lineWidth=focusMode?1:1.5;ctx.beginPath();ctx.moveTo(...a.p);ctx.lineTo(...b.p);ctx.stroke()}
  const origin=projected(0,0,0);ctx.beginPath();ctx.arc(...origin,3.4,0,7);ctx.fillStyle='#eafaff';ctx.fill();ctx.font='12px system-ui';ctx.fillStyle='#a8c1d3';ctx.fillText('0',origin[0]+9,origin[1]+14);
  for(const [label,r,g,b,color] of [['R',1,0,0,'#ff9b91'],['G',0,1,0,'#8aecd1'],['B',0,0,1,'#90caff']]){let p=projected(r,g,b);ctx.textAlign='center';ctx.font='bold 21px system-ui';ctx.fillStyle=color;ctx.fillText(label,p[0],p[1]-12)}
- ctx.textAlign='left';ctx.fillStyle='#97b2c6';ctx.font='11px system-ui';ctx.fillText('RGB [0, 1] · '+coordMode.toUpperCase(),18,H-22);
- if(highOut){ctx.textAlign='right';ctx.fillStyle='#f6a8a0';ctx.fillText('● OUT OF RANGE',W-16,H-22)}
+ ctx.textAlign='left';ctx.fillStyle='#97b2c6';ctx.font='11px system-ui';ctx.fillText(focusMode?'SYNTHETIC RGB · '+coordMode.toUpperCase():'RGB [0, 1] · LINEAR',18,H-22);
+ if(focusMode?conceptOverflow>0:highOut){ctx.textAlign='right';ctx.fillStyle='#f6a8a0';ctx.fillText('● OUT OF RANGE',W-16,H-22)}
  syncFloatingCube();
 }
 function scopeCoords(r,g,b){const R=enc(r),G=enc(g),B=enc(b);const Y=.2126*R+.7152*G+.0722*B;const cb=(B-Y)/1.8556,cr=(R-Y)/1.5748;return [255+cb*330,205-cr*330]}
@@ -410,7 +478,7 @@ function update(){if(!signal)return;const n=width*height,k=Math.pow(2,+ev.value)
 }
 function request(){if(scheduleFlag)return;scheduleFlag=true;requestAnimationFrame(()=>{scheduleFlag=false;update()})}
 ev.addEventListener('input',request);sat.addEventListener('input',request);
-function setMode(m){mode=m;if(focusMode)cubeRender=m;else labRender=m;$('density').classList.toggle('sel',m==='density');$('particles').classList.toggle('sel',m==='particles');$('logdensity').classList.toggle('sel',m==='logdensity');drawCube()};$('density').onclick=()=>setMode('density');$('particles').onclick=()=>setMode('particles');$('logdensity').onclick=()=>setMode('logdensity');$('view').onclick=()=>{yaw=.8;pitch=.52;drawCube()};
+function setMode(m){mode=m;if(focusMode)cubeRender=m;else labRender=m;$('density').classList.toggle('sel',m==='density');$('particles').classList.toggle('sel',m==='particles');$('logdensity').classList.toggle('sel',m==='logdensity');drawCube()};$('density').onclick=()=>setMode('density');$('particles').onclick=()=>setMode('particles');$('logdensity').onclick=()=>setMode('logdensity');$('view').onclick=()=>{yaw=.8;pitch=.52;if(focusMode){viewZoom=1;$('zoom').value='100';$('zoom-text').textContent='100%'}drawCube()};
 let orbit=false,lx=0,ly=0;cube.addEventListener('pointerdown',e=>{orbit=true;lx=e.clientX;ly=e.clientY;cube.setPointerCapture(e.pointerId)});cube.addEventListener('pointermove',e=>{if(!orbit)return;yaw+=(e.clientX-lx)*.009;pitch=clip(pitch+(e.clientY-ly)*.007,-1.2,1.2);lx=e.clientX;ly=e.clientY;drawCube()});cube.addEventListener('pointerup',()=>orbit=false);cube.addEventListener('pointercancel',()=>orbit=false);
 
  // Keep a smaller live version visible while mobile users edit controls below.
